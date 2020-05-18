@@ -171,6 +171,9 @@ for segment in segments:
 # Now convert to geopandas
 gdf_segs = geopandas.GeoDataFrame( dfsegs, geometry=stream_lines )
 
+# Save to shapefile -- some field names will be truncated
+gdf_segs.to_file('whitewater_river_segments')
+
 """
 # Create the lines for the shapefile
 sf_lines = []
@@ -201,6 +204,32 @@ for i in range(len(dfsegs)):
 sf.linez(sf_lines[i])
 sf.close()
 """
+
+
+
+# Export the points (mouths, heads, confluences)
+
+# Create DataFrames of only these nodes
+_df_mouths = rp.loc[mouth_nodes, :]
+_df_heads = rp.loc[channel_head_nodes, :]
+_df_confluences = rp.loc[confluence_downstream_nodes, :]
+
+# Add in a "type" parameter
+_df_mouths['network_node_type'] = 'mouth'
+_df_heads['network_node_type'] = 'head'
+_df_confluences['network_node_type'] = 'confluence'
+
+# All nodes in network
+_df_NetworkNodes = pd.concat([_df_heads, _df_confluences, _df_mouths])
+
+gdf_NetworkNodes = geopandas.GeoDataFrame( _df_NetworkNodes,
+                                           geometry=geopandas.points_from_xy(
+                                                _df_NetworkNodes.lon,
+                                                _df_NetworkNodes.lat) )
+
+# Save to shapefile -- some field names will be truncated
+gdf_NetworkNodes.to_file('whitewater_river_nodes')
+
 
 
 
