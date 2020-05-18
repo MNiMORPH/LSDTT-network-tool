@@ -1,0 +1,234 @@
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+import matplotlib
+from scipy.optimize import curve_fit
+import geopandas as gpd
+from shapely.geometry import Polyline
+plt.ion()
+
+window = 1000 # meters per "reach"
+
+rp = pd.read_csv('/home/andy/dataanalysis/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+#rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
+segment_ids = np.array(list(set(rp['source_key'])))
+
+# Get the source key for all receiver nodes
+# This will show the upstream limit(s) of confluences, and provide the
+# node IDs of these confluences.
+receiver_nodes_at_mouths = []
+rp.insert(len(rp.columns), 'receiver_source_key', None)
+#for _node in rp.index:
+# IMPORTANT FOR EFFICIENCY: MINIMIZE THE NUMBER OF TIMES YOU UPDATE THE
+# DATAFRAME
+_tmplist = []
+for _receiver_node in rp['receiver_node']:
+    #_receiver_node = rp.loc[_node, 'receiver_node']
+    try:
+        _receiver_source_key = rp.loc[_receiver_node, 'source_key']
+    except:
+        print("Found mouth node. Offmap receiver node ID: "
+                + str(_receiver_node))
+        _receiver_source_key = -1
+        receiver_nodes_at_mouths.append(_receiver_node)
+    _tmplist.append(_receiver_source_key)
+rp['receiver_source_key'] = _tmplist
+
+# In the case of the downstream-most one, no node with this ID will exist
+mouth_nodes = list(rp[rp['receiver_source_key'] == -1].index)
+
+# Next, identify these confluences by places where the receiver_source_key
+# differs from the source_key
+confluence_downstream_nodes = list(set(list(rp['receiver_node']
+                                                  [rp['source_key'] !=
+                                                  rp['receiver_source_key']])))
+# Remove river mouths
+# Inefficient but should be relatively few points at this step.
+confluence_downstream_nodes = np.array(confluence_downstream_nodes)
+for _receiver_node_at_mouth in receiver_nodes_at_mouths:
+    confluence_downstream_nodes = confluence_downstream_nodes\
+                                    [confluence_downstream_nodes
+                                     != _receiver_node_at_mouth]
+
+# Create a set of confluence locations
+confluences = []
+for _node in confluence_downstream_nodes:
+    _x = rp.loc[_node, 'E_UTM']
+    _y = rp.loc[_node, 'N_UTM']
+    confluences.append([_x, _y])
+confluences = np.array(confluences)
+
+# Create a set of river mouth locations
+mouths = []
+for _node in mouth_nodes:
+    _x = rp.loc[_node, 'E_UTM']
+    _y = rp.loc[_node, 'N_UTM']
+    mouths.append([_x, _y])
+mouths = np.array(mouths)
+
+# Obtain channel-head locations
+# They are in another file, but whatever.... reduce data dependencies
+channel_head_nodes = []
+source_keys = list(set(list(rp['source_key'])))
+for _source_key in source_keys:
+    channel_head_nodes.append( rp.index[rp['source_key'] == _source_key][0] )
+channel_head_nodes = np.array(channel_head_nodes)
+
+# Create a list of segment sources
+# This includes all channel heads (true "sources") and confluences
+source_nodes = np.hstack(( channel_head_nodes, confluence_downstream_nodes ))
+
+# Create a list of segment terminations
+# This includes all confluence and mouth nodes
+termination_nodes = np.hstack(( confluence_downstream_nodes, mouth_nodes ))
+
+# Create a list of lists of node IDs going down each segment in the network
+# Each segment will include as its downstream-most cell the upstream-most
+# node from the next tributary junction.
+# This is duplicitive, but helpful for network dynamics and plotting
+# line segments that represent the river attributes.
+segments_nodes = []
+for _source_node in source_nodes:
+    segment_nodes = [_source_node]
+    segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_node'])
+    while segment_nodes[-1] not in termination_nodes:
+        segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_node'])
+    segments_nodes.append(segment_nodes)
+
+# Next, reconstruct the data table elements for each of these points
+# within its specific segment in the network
+segments = []
+for segment_nodes in segments_nodes:
+    segments.append( rp.loc[segment_nodes, :] )
+
+# Apply an arbitrary ID in order
+_id = 0
+segment_ids = []
+for segment in segments:
+    segment_ids.append(_id)
+    segment['segment_id'] = _id
+    _id += 1
+segment_ids = np.array(segment_ids)
+
+# Obtain correlative ID numbers from the source nodes
+internal_segment_ids = []
+for segment in segments:
+    internal_segment_ids.append(segment.index[0])
+internal_segment_ids = np.array(internal_segment_ids)
+
+# Also record which segment they send their flow to
+internal_receiver_segment_ids = []
+for segment in segments:
+    internal_receiver_segment_ids.append( segment.index[-1] )
+internal_receiver_segment_ids = np.array(internal_receiver_segment_ids)
+
+# To-segment IDs
+toseg = []
+for i in range(len(internal_segment_ids)):
+    toseg_bool = (internal_receiver_segment_ids[i] == internal_segment_ids)
+    if np.sum(toseg_bool) > 1:
+        print(i)
+        print(np.sum(toseg_bool))
+        print("ERROR! NETWORK IS BRANCHING.")
+    elif np.sum(toseg_bool) == 0:
+        print(i)
+        print(np.sum(toseg_bool))
+        print("Channel mouth; segment ID -1.")
+        toseg.append(-1)
+    else:
+        toseg.append(int(segment_ids[toseg_bool]))
+toseg = np.array(toseg)
+
+# Unnecessary, but why not? Makes life easier.
+for i in range(len(segments)):
+    segment = segments[i]
+    segment['toseg'] = receiver_segment_id[i] # = toseg
+    _id += 1
+
+# Now we have the full set of points that can be written to file.
+# But how about the GIS lines?
+# Let's get more information in each segment.
+# And let's add it to its own DataFrame
+
+dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
+for i in range(len(segments)):
+    segment = segments[i]
+    dfsegs['slope'][i] = (np.max(segment['z']) - np.min(segment['z'])) / \
+                         ( np.max(segment['flow_distance']) \
+                           - np.min(segment['flow_distance']) )
+    dfsegs['drainage_area_km2'][i] = np.mean(segment['drainage_area'])/1E6
+    dfsegs['chi'][i] = np.mean(segment['chi'])
+    # These are going to be particular to this case
+    dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
+    #dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
+
+# Create a set of LineString objects
+stream_lines = []
+for segment in segments:
+    stream_lines.append( LineString(
+                            segment.loc[:, ('lon', 'lat', 'z')].values ) )
+
+# Now convert to geopandas
+gdf_segs = geopandas.GeoDataFrame( dfsegs, geometry=stream_lines )
+
+"""
+# Create the lines for the shapefile
+sf_lines = []
+for segment in segments:
+    _tmparr = segment.loc[:, ('lon', 'lat', 'z')].values
+    _tmplist = []
+    for row in _tmparr:
+        _tmplist.append(list(row))
+    sf_lines.append( _tmplist )
+
+# Now write the results to a shapefile
+sf = shapefile.Writer('ww-lines')
+sf.shapeType = shapefile.POLYLINEZ # 13; POLYLINE=3
+sf.field('id', 'N')
+sf.field('toseg', 'N')
+sf.field('slope', 'N', decimal=7)
+sf.field('drainage_area_km2', 'N', decimal=6)
+sf.field('chi', 'N', decimal=3)
+# Specific to this data set
+sf.field('depth_to_bedrock_m', 'N', decimal=1)
+for i in range(len(dfsegs)):
+    sf.record( id = dfsegs['id'][i],
+              toseg = dfsegs['toseg'][i],
+              slope = dfsegs['slope'][i],
+              drainage_area_km2 = dfsegs['drainage_area_km2'][i],
+              chi = dfsegs['chi'][i],
+              depth_to_bedrock_m = dfsegs['depth_to_bedrock_m'][i] )
+sf.linez(sf_lines[i])
+sf.close()
+"""
+
+
+
+plt.figure()
+for segment in segments:
+    plt.plot(segment['flow_distance'], segment['z'], 'k-')
+
+
+plt.figure()
+for segment in segments:
+    plt.plot(segment['E_UTM'], segment['N_UTM'])
+
+plt.plot(confluences[:,0], confluences[:,1], 'bo')
+plt.plot(mouths[:,0], mouths[:,1], 'ro')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for i in range(1):
+    segment = rp[rp['source_key'] == i]
+    plt.plot(segment.flow_distance, segment.segmented_elevation)
