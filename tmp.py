@@ -140,6 +140,7 @@ for i in range(len(internal_segment_ids)):
 toseg = np.array(toseg)
 
 # Unnecessary, but why not? Makes life easier.
+# Especially once I use these to create the nodes!
 for i in range(len(segments)):
     segment = segments[i]
     segment['toseg'] = receiver_segment_id[i] # = toseg
@@ -213,6 +214,10 @@ sf.close()
 _df_mouths = rp.loc[mouth_nodes, :]
 _df_heads = rp.loc[channel_head_nodes, :]
 _df_confluences = rp.loc[confluence_downstream_nodes, :]
+# But these don't have the extra info in them. So:
+# START HERE
+_pdout = []
+# for
 
 # Add in a "type" parameter
 _df_mouths['network_node_type'] = 'mouth'
@@ -229,6 +234,23 @@ gdf_NetworkNodes = geopandas.GeoDataFrame( _df_NetworkNodes,
 
 # Save to shapefile -- some field names will be truncated
 gdf_NetworkNodes.to_file('whitewater_river_nodes')
+
+
+
+
+# Export for Landlab NetworkSedimentTransporter
+
+# Create a geoDataFrame with the minimum required data
+NST_nodes = gdf_NetworkNodes.loc[:, [ 'receiver_node',
+                                      'lon', 'lat', 'z',
+                                      'drainage_area', 'geometry'] ]
+
+# Add NST_nodes.index as the node ID
+
+# Build the
+
+
+
 
 
 
