@@ -4,12 +4,11 @@ from matplotlib import pyplot as plt
 import matplotlib
 from scipy.optimize import curve_fit
 import geopandas as gpd
-#Changed line below from "from shapely.geometry import Polyline"-SP
 from shapely.geometry import LineString
-plt.ion()
+#plt.ion()
 
 window = 1000 # meters per "reach"
-#Upated file path for my computer-SP
+
 rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
 #rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
@@ -144,10 +143,7 @@ toseg = np.array(toseg)
 # Especially once I use these to create the nodes!
 for i in range(len(segments)):
     segment = segments[i]
-    #Receiver_segment_id doesn't exist-SP
-    #Replace with internal_receiver_segment_ids[i]
-    #segment['toseg'] = receiver_segment_id[i] # = toseg (changing this-SP)
-    segment['toseg'] = internal_receiver_segment_ids[i]
+    segment['toseg'] = internal_receiver_segment_ids[i] # = toseg
     _id += 1
 
 # Now we have the full set of points that can be written to file.
@@ -156,12 +152,10 @@ for i in range(len(segments)):
 # And let's add it to its own DataFrame
 
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
-#Need to add dfsegs lines below to create columns for for loop to run.-SP
 dfsegs.insert(len(dfsegs.columns), 'slope', None)
 dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
 dfsegs.insert(len(dfsegs.columns), 'chi', None)
 dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
-
 for i in range(len(segments)):
     segment = segments[i]
     dfsegs['slope'][i] = (np.max(segment['z']) - np.min(segment['z'])) / \
@@ -180,10 +174,12 @@ for segment in segments:
                             segment.loc[:, ('lon', 'lat', 'z')].values ) )
 
 # Now convert to geopandas
-#Change geopandas to gpd- SP
 gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines )
+
 # Save to GeoPackage
 gdf_segs.to_file('whitewater_river_segments.gpkg', driver="GPKG")
+
+print("Done!")
 
 """
 # Create the lines for the shapefile
@@ -217,7 +213,7 @@ sf.close()
 """
 
 
-
+'''
 # Export the points (mouths, heads, confluences)
 
 # Create DataFrames of only these nodes
@@ -236,9 +232,9 @@ _df_confluences['network_node_type'] = 'confluence'
 
 # All nodes in network
 _df_NetworkNodes = pd.concat([_df_heads, _df_confluences, _df_mouths])
-#Change geopandas to gpd-SP
-gdf_NetworkNodes = gpd.GeoDataFrame( _df_NetworkNodes,
-                                           geometry=gpd.points_from_xy(
+
+gdf_NetworkNodes = geopandas.GeoDataFrame( _df_NetworkNodes,
+                                           geometry=geopandas.points_from_xy(
                                                 _df_NetworkNodes.lon,
                                                 _df_NetworkNodes.lat) )
 
@@ -263,7 +259,7 @@ NST_nodes = gdf_NetworkNodes.loc[:, [ 'receiver_node',
 
 
 
-
+'''
 
 plt.figure()
 for segment in segments:
@@ -276,8 +272,7 @@ for segment in segments:
 
 plt.plot(confluences[:,0], confluences[:,1], 'bo')
 plt.plot(mouths[:,0], mouths[:,1], 'ro')
-
-
+plt.show()
 
 
 
