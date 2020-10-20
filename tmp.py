@@ -4,12 +4,12 @@ from matplotlib import pyplot as plt
 import matplotlib
 from scipy.optimize import curve_fit
 import geopandas as gpd
-from shapely.geometry import Polyline
-plt.ion()
+from shapely.geometry import LineString
+#plt.ion()
 
 window = 1000 # meters per "reach"
 
-rp = pd.read_csv('/home/andy/dataanalysis/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
 #rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
 
@@ -143,7 +143,7 @@ toseg = np.array(toseg)
 # Especially once I use these to create the nodes!
 for i in range(len(segments)):
     segment = segments[i]
-    segment['toseg'] = receiver_segment_id[i] # = toseg
+    segment['toseg'] = internal_receiver_segment_ids[i] # = toseg
     _id += 1
 
 # Now we have the full set of points that can be written to file.
@@ -152,6 +152,10 @@ for i in range(len(segments)):
 # And let's add it to its own DataFrame
 
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
+dfsegs.insert(len(dfsegs.columns), 'slope', None)
+dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
+dfsegs.insert(len(dfsegs.columns), 'chi', None)
+dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
 for i in range(len(segments)):
     segment = segments[i]
     dfsegs['slope'][i] = (np.max(segment['z']) - np.min(segment['z'])) / \
@@ -170,10 +174,12 @@ for segment in segments:
                             segment.loc[:, ('lon', 'lat', 'z')].values ) )
 
 # Now convert to geopandas
-gdf_segs = geopandas.GeoDataFrame( dfsegs, geometry=stream_lines )
+gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines )
 
-# Save to shapefile -- some field names will be truncated
-gdf_segs.to_file('whitewater_river_segments')
+# Save to GeoPackage
+gdf_segs.to_file('whitewater_river_segments.gpkg', driver="GPKG")
+
+print("Done!")
 
 """
 # Create the lines for the shapefile
@@ -207,7 +213,7 @@ sf.close()
 """
 
 
-
+'''
 # Export the points (mouths, heads, confluences)
 
 # Create DataFrames of only these nodes
@@ -253,7 +259,7 @@ NST_nodes = gdf_NetworkNodes.loc[:, [ 'receiver_node',
 
 
 
-
+'''
 
 plt.figure()
 for segment in segments:
@@ -266,8 +272,7 @@ for segment in segments:
 
 plt.plot(confluences[:,0], confluences[:,1], 'bo')
 plt.plot(mouths[:,0], mouths[:,1], 'ro')
-
-
+plt.show()
 
 
 
