@@ -16,7 +16,7 @@ Builds a vectorized drainage network from LSDTopoTools outputs, divided at tribu
   * Capability to select a `node_ID` that the code will walk down to generate a channel long profile.
     * This will make it possible to make channel profiles for mutiple branches, etc.
 
-#### Planning to use `arg_parse` to make the tool much easier to work with.
+### Planning to use `argparse` to make the tool much easier to work with.
 
 ## Future expansion goals
 ### Pairing `LSDTT_terraces` with channel long profile outputs to generate plot with both.
