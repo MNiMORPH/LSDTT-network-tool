@@ -288,3 +288,23 @@ plt.show()
 for i in range(1):
     segment = rp[rp['source_key'] == i]
     plt.plot(segment.flow_distance, segment.segmented_elevation)
+
+#Generating the geopackage to begin path selection
+print('Now I will create a geopackage to select segments for a path.')
+
+#Creating df to be used to select segment for path
+dfsegsselect= pd.DataFrame ({'segment_ID':segment_ids, 'toseg':toseg})
+
+# Create a set of LineString objects to be used for selection
+stream_lines_select = []
+for segment in segments:
+    stream_lines_select.append( LineString(
+                            segment.loc[:, ('lon', 'lat', 'z')].values ) )
+
+gdf_segsselect = gpd.GeoDataFrame( dfsegsselect, geometry=stream_lines_select )
+
+# Save to GeoPackage
+gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
+
+print('Your geopackage is ready!')
+print('Open in GIS to select your starter segment_ID.')
