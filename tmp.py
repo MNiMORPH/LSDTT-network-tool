@@ -195,6 +195,19 @@ if not input_segment_id_found:
 
 
 
+# Creation of dfpath will go here
+#Right now, this is just a placeholder
+dfpath = pd.DataFrame({'path_id': list(range(10)), 'seg_id': list(range(10)), 'to_seg': list(range(-1, 9))})
+
+
+#Pulling required nodes from segments
+
+queried_segments = []
+for seg_id in dfpath['seg_id']:
+    queried_segments.append(seg_id)
+print(queried_segments)
+
+
 
 
 
