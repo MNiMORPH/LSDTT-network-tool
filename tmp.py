@@ -289,6 +289,10 @@ for i in range(1):
     segment = rp[rp['source_key'] == i]
     plt.plot(segment.flow_distance, segment.segmented_elevation)
 
+
+
+
+
 #Generating the geopackage to begin path selection
 print('Now I will create a geopackage to select segments for a path.')
 
@@ -308,3 +312,53 @@ gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
 
 print('Your geopackage is ready!')
 print('Open in GIS to select your starter segment_ID.')
+
+
+
+
+
+#Adding in Peter's changes (with some tweaks)
+input_segment_id = 2789
+
+#Find out if the input segment is in the segments dataframe
+input_segment_id_found = False
+for seg_id in dfsegs['id']:
+    if seg_id == input_segment_id:
+        input_segment_id_found = True
+        print("Segment ID found.")
+#We'll probably want this to raise an exception so that it doesn't continue with the pathmaking if the given ID doesn't exist
+# for right now, though, we'll just print a message
+if not input_segment_id_found:
+    print("Error: No segment with the given ID")
+
+
+#End Peter edits, begin attempts to generate path
+
+#convert input to int
+input_segment_id= int(input_segment_id)
+
+#Look up user input seg id, create column is_input w/true and false
+dfsegs['is_input'] = np.where(dfsegs['id']== input_segment_id, True, False)
+
+#Create new df called dfpath that is populated by all the true values.
+dfpath = dfsegs[dfsegs['is_input'] == True]
+
+dfpath.head()
+
+#find relevant toseg
+input_toseg=dfpath.loc[dfpath['id']== input_segment_id, 'toseg']
+
+#convert to int
+input_toseg=int(input_toseg)
+
+#query dfsegs to find the segment with the same id as toseg
+dfsegs['is_input'] = np.where(dfsegs['id']== input_toseg, True, False)
+
+#take this line ad append it to dfpath
+dfpath.append(dfsegs[dfsegs['is_input'] == True])
+
+dfpath.head()
+
+#This is currently working to create the dfpath with the first part
+#I am also successfully finding the toseg, just having issues then going back
+#and trying to keep adding in info starting with the toseg
