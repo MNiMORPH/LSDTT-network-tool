@@ -151,21 +151,34 @@ for i in range(len(segments)):
 # Let's get more information in each segment.
 # And let's add it to its own DataFrame
 
+
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
+dfsegs.insert(len(dfsegs.columns), 'lat', None)
+dfsegs.insert(len(dfsegs.columns), 'lon', None)
 dfsegs.insert(len(dfsegs.columns), 'slope', None)
+dfsegs.insert(len(dfsegs.columns), 'max_elev', None)
+dfsegs.insert(len(dfsegs.columns), 'min_elev', None)
+dfsegs.insert(len(dfsegs.columns), 'average_elev', None)
 dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
 dfsegs.insert(len(dfsegs.columns), 'chi', None)
 dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
 for i in range(len(segments)):
     segment = segments[i]
+    dfsegs['lat'][i] = (segment['lat'])
+    dfsegs['lon'][i] = (segment['lon'])
     dfsegs['slope'][i] = (np.max(segment['z']) - np.min(segment['z'])) / \
                          ( np.max(segment['flow_distance']) \
                            - np.min(segment['flow_distance']) )
+    dfsegs['average_elev'][i] = (np.max(segment['z']) + np.min(segment['z'])) / 2
+    dfsegs['max_elev'][i] = (np.max(segment['z']))
+    dfsegs['min_elev'][i] = (np.min(segment['z']))
     dfsegs['drainage_area_km2'][i] = np.mean(segment['drainage_area'])/1E6
     dfsegs['chi'][i] = np.mean(segment['chi'])
     # These are going to be particular to this case
     dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
     #dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
+
+
 
 # Create a set of LineString objects
 stream_lines = []
