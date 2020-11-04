@@ -345,20 +345,20 @@ dfpath = dfsegs[dfsegs['is_input'] == True]
 
 dfpath.head()
 
-#find relevant toseg
-input_toseg=dfpath.loc[dfpath['id']== input_segment_id, 'toseg']
+input_toseg = input_segment_id
+while input_toseg != -1:
+    #find relevant toseg
+    input_toseg=dfpath.loc[dfpath['id']== input_segment_id, 'toseg']
+    #convert to int
+    input_toseg=int(input_toseg)
+    #query dfsegs to find the segment with the same id as toseg
+    dfsegs['is_input'] = np.where(dfsegs['id']== input_toseg, True, False)
+    #take this line ad append it to dfpath
+    dfpath = dfpath.append(dfsegs[dfsegs['is_input'] == True])
+    input_segment_id = input_toseg
 
-#convert to int
-input_toseg=int(input_toseg)
 
-#query dfsegs to find the segment with the same id as toseg
-dfsegs['is_input'] = np.where(dfsegs['id']== input_toseg, True, False)
+dfpath
 
-#take this line ad append it to dfpath
-dfpath.append(dfsegs[dfsegs['is_input'] == True])
-
-dfpath.head()
-
-#This is currently working to create the dfpath with the first part
-#I am also successfully finding the toseg, just having issues then going back
-#and trying to keep adding in info starting with the toseg
+#This is currently working to create the dfpath
+#Working now to pull relevant elevation, lat/long information into dfpath
