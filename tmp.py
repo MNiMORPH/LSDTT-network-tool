@@ -10,6 +10,7 @@ from shapely.geometry import LineString
 window = 1000 # meters per "reach"
 
 rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+#rp = pd.read_csv('C:/LSDTopoTools/data/UMN/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
 #rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
 
@@ -266,40 +267,7 @@ NST_nodes = gdf_NetworkNodes.loc[:, [ 'receiver_node',
 
 # Build the
 
-
-
-
-
 '''
-
-plt.figure()
-for segment in segments:
-    plt.plot(segment['flow_distance'], segment['z'], 'k-')
-
-
-plt.figure()
-for segment in segments:
-    plt.plot(segment['E_UTM'], segment['N_UTM'])
-
-plt.plot(confluences[:,0], confluences[:,1], 'bo')
-plt.plot(mouths[:,0], mouths[:,1], 'ro')
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-for i in range(1):
-    segment = rp[rp['source_key'] == i]
-    plt.plot(segment.flow_distance, segment.segmented_elevation)
-
 
 
 
@@ -387,3 +355,31 @@ for _id in queried_segments:
 dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
 dfpath_nodes
+
+# Build Plots
+
+# Profile of entire network (selected path in red)
+plt.figure()
+for segment in segments:
+    plt.plot(segment['flow_distance'], segment['z'], 'k-')
+plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['z'], 'r-')
+
+# Map view of network (selected path in red)
+plt.figure()
+for segment in segments:
+    plt.plot(segment['E_UTM'], segment['N_UTM'])
+
+plt.plot(confluences[:,0], confluences[:,1], 'bo')
+plt.plot(mouths[:,0], mouths[:,1], 'ro')
+plt.plot(dfpath_nodes['E_UTM'], dfpath_nodes['N_UTM'], 'r-')
+
+plt.figure()
+
+# Map view of the selected path
+plt.plot(dfpath_nodes['E_UTM'], dfpath_nodes['N_UTM'], 'k-')
+plt.figure()
+
+# Long profile of the selected path
+plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['z'])
+
+plt.show()
