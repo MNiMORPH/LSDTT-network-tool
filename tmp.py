@@ -206,7 +206,7 @@ for segment in segments:
 gdf_segsselect = gpd.GeoDataFrame( dfsegsselect, geometry=stream_lines_select )
 
 # Save to GeoPackage
-gdf_segsselect.to_file('segs_select_LaLeona.gpkg', driver="GPKG")
+gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
 
 print('Your geopackage is ready!')
 print('Open in GIS to select your starter segment_ID.')
