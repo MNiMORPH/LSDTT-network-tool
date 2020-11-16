@@ -286,6 +286,7 @@ plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.xlabel('Downchannel distance [km]')
 plt.ylabel('Elevation [m]')
 plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
+plt.gca().invert_xaxis()
 
 plt.savefig("AllChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
         orientation='portrait', papertype=None, format=None,
@@ -332,6 +333,7 @@ plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
 plt.xlabel('Downchannel distance [km]')
 plt.ylabel('Elevation [m]')
+plt.gca().invert_xaxis()
 
 plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
         orientation='portrait', papertype=None, format=None,
