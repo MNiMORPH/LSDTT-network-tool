@@ -278,32 +278,64 @@ dfpath_nodes
 
 # Build Plots
 
-# Profile of entire network (selected path in red)
+# Profile of entire network (selected path in black)
 plt.figure()
 for segment in segments:
-    plt.plot(segment['flow_distance'], segment['elevation'], 'k-')
+    plt.plot((segment['flow_distance']/1000), segment['elevation'], color= 'gray', linewidth=1)
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['elevation'], 'r-')
+plt.xlabel('Downchannel distance [km]')
+plt.ylabel('Elevation [m]')
+plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
 
-# Map view of network (selected path in red)
+plt.savefig("AllChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Map view of network (selected path in black)
 plt.figure()
 for segment in segments:
-    plt.plot(segment['longitude'], segment['latitude'])
+    plt.plot(segment['longitude'], segment['latitude'], color= 'grey')
 
-plt.plot(confluences[:,0], confluences[:,1], 'bo')
-plt.plot(mouths[:,0], mouths[:,1], 'ro')
+#plt.plot(confluences[:,0], confluences[:,1], 'bo')
+plt.plot(mouths[:,0], mouths[:,1], color= 'grey', linewidth= 1)
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'r-')
+plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 6)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+plt.savefig("NetworkMap", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
 
 plt.figure()
+
 
 # Map view of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-')
+plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 5)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+
+plt.savefig("PathMap", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
 plt.figure()
+
 
 # Long profile of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['elevation'])
+plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
+plt.xlabel('Downchannel distance [km]')
+plt.ylabel('Elevation [m]')
 
-plt.show()
+plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
+plt.figure()
