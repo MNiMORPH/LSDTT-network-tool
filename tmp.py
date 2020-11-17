@@ -25,13 +25,14 @@ rp.insert(len(rp.columns), 'receiver_source_key', None)
 
 _tmplist = []
 for _node in rp.index:
-    if _node != rp.loc[_node, 'receiver_NI']:
-        _receiver_source_key = rp.loc[rp.loc[_node, 'receiver_NI'], 'source_key']
+    _receiver_node = rp.loc[_node, 'receiver_NI']
+    if _receiver_node in rp.index and _node != _receiver_node:
+        _receiver_source_key = rp.loc[_receiver_node, 'source_key']
     else:
         print("Found mouth node. Offmap receiver node ID: "
-                + str(_node))
+                + str(_receiver_node))
         _receiver_source_key = -1
-        receiver_nodes_at_mouths.append(_node)
+        receiver_nodes_at_mouths.append(_receiver_node)
     _tmplist.append(_receiver_source_key)
 rp['receiver_source_key'] = _tmplist
 
@@ -218,7 +219,7 @@ print('Open in GIS to select your starter segment_ID.')
 
 
 #Input selected segment_ID. This will be the start of the path.
-input_segment_id = 2789
+input_segment_id = 155
 
 #Find out if the input segment is in the segments dataframe.
 input_segment_id_found = False
