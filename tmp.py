@@ -9,7 +9,9 @@ from shapely.geometry import LineString
 
 window = 1000 # meters per "reach"
 
-rp = pd.read_csv('/Users/Shanti/Desktop/Data/LSDTT-Outputs/LaLeona_SRTM_Reproj_chi_data_map.csv', index_col='NI')
+#rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+rp = pd.read_csv('zum_chi_chi_data_map.csv', index_col='NI', na_filter=False)
+#rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
 
 # Get the source key for all receiver nodes
@@ -23,13 +25,14 @@ rp.insert(len(rp.columns), 'receiver_source_key', None)
 
 _tmplist = []
 for _node in rp.index:
-    if _node != rp.loc[_node, 'receiver_NI']:
-        _receiver_source_key = rp.loc[rp.loc[_node, 'receiver_NI'], 'source_key']
+    _receiver_node = rp.loc[_node, 'receiver_NI']
+    if _receiver_node in rp.index and _node != _receiver_node:
+        _receiver_source_key = rp.loc[_receiver_node, 'source_key']
     else:
         print("Found mouth node. Offmap receiver node ID: "
-                + str(_node))
+                + str(_receiver_node))
         _receiver_source_key = -1
-        receiver_nodes_at_mouths.append(_node)
+        receiver_nodes_at_mouths.append(_receiver_node)
     _tmplist.append(_receiver_source_key)
 rp['receiver_source_key'] = _tmplist
 
@@ -216,8 +219,8 @@ print('Open in GIS to select your starter segment_ID.')
 
 
 #Input selected segment_ID. This will be the start of the path.
-input_segment_id = 313
-river_name= "La Leona"
+input_segment_id = 155
+river_name = "Zumbro River"
 
 #Find out if the input segment is in the segments dataframe.
 input_segment_id_found = False
@@ -275,9 +278,7 @@ for _id in queried_segments:
 dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
 dfpath_nodes
-
 # Build Plots
-
 # Profile of entire network (selected path in black)
 plt.figure()
 for segment in segments:
