@@ -9,7 +9,8 @@ from shapely.geometry import LineString
 
 window = 1000 # meters per "reach"
 
-rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+rp = pd.read_csv('C:/LSDTopoTools/data/UMN/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
+input_segment_id = 302
 #rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
 
@@ -191,6 +192,38 @@ gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines )
 gdf_segs.to_file('whitewater_river_segments.gpkg', driver="GPKG")
 
 print("Done!")
+
+
+#Find out if the input segment is in the segments dataframe
+input_segment_id_found = False
+for seg_id in dfsegs['id']:
+    if seg_id == input_segment_id:
+        input_segment_id_found = True
+#We'll probably want this to raise an exception so that it doesn't continue with the pathmaking if the given ID doesn't exist
+# for right now, though, we'll just print a message        
+if not input_segment_id_found:
+    print("Error: No segment with the given ID")    
+
+
+
+#Pulling required nodes from segments
+#This part worked on a fake dataframe I made, but it might need a bit of adjustment to work with the real one
+queried_segments = []
+for seg_id in dfpath['id']:
+    queried_segments.append(seg_id)
+print(queried_segments)
+
+#This bit I just wrote up really quickly as a sort of framework for getting the nodes. It might work, but it might have problems.
+#I haven't tested it yet
+#Find nodes in each queried segment
+path_nodes = []
+for segment_id in queried_segments:
+    for node in segments[segment_id]:
+        path_nodes.append(node)
+
+
+
+
 
 """
 # Create the lines for the shapefile
