@@ -151,8 +151,14 @@ for i in range(len(segments)):
 # Let's get more information in each segment.
 # And let's add it to its own DataFrame
 
+
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
+dfsegs.insert(len(dfsegs.columns), 'lat', None)
+dfsegs.insert(len(dfsegs.columns), 'lon', None)
 dfsegs.insert(len(dfsegs.columns), 'slope', None)
+dfsegs.insert(len(dfsegs.columns), 'max_elev', None)
+dfsegs.insert(len(dfsegs.columns), 'min_elev', None)
+dfsegs.insert(len(dfsegs.columns), 'average_elev', None)
 dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
 dfsegs.insert(len(dfsegs.columns), 'chi', None)
 dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
@@ -161,11 +167,16 @@ for i in range(len(segments)):
     dfsegs['slope'][i] = (np.max(segment['z']) - np.min(segment['z'])) / \
                          ( np.max(segment['flow_distance']) \
                            - np.min(segment['flow_distance']) )
+    dfsegs['average_elev'][i] = (np.max(segment['z']) + np.min(segment['z'])) / 2
+    dfsegs['max_elev'][i] = (np.max(segment['z']))
+    dfsegs['min_elev'][i] = (np.min(segment['z']))
     dfsegs['drainage_area_km2'][i] = np.mean(segment['drainage_area'])/1E6
     dfsegs['chi'][i] = np.mean(segment['chi'])
     # These are going to be particular to this case
     dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
     #dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
+
+
 
 # Create a set of LineString objects
 stream_lines = []
@@ -288,3 +299,91 @@ plt.show()
 for i in range(1):
     segment = rp[rp['source_key'] == i]
     plt.plot(segment.flow_distance, segment.segmented_elevation)
+
+
+
+
+
+#Generating the geopackage to begin path selection
+print('Now I will create a geopackage to select segments for a path.')
+
+#Creating df to be used to select segment for path
+dfsegsselect= pd.DataFrame ({'segment_ID':segment_ids, 'toseg':toseg})
+
+# Create a set of LineString objects to be used for selection
+stream_lines_select = []
+for segment in segments:
+    stream_lines_select.append( LineString(
+                            segment.loc[:, ('lon', 'lat', 'z')].values ) )
+
+gdf_segsselect = gpd.GeoDataFrame( dfsegsselect, geometry=stream_lines_select )
+
+# Save to GeoPackage
+gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
+
+print('Your geopackage is ready!')
+print('Open in GIS to select your starter segment_ID.')
+
+
+
+
+
+#Input selected segment_ID. This will be the start of the path.
+input_segment_id = 2789
+
+#Find out if the input segment is in the segments dataframe.
+input_segment_id_found = False
+for seg_id in dfsegs['id']:
+    if seg_id == input_segment_id:
+        input_segment_id_found = True
+        print("Segment ID found.")
+
+#We'll probably want this to raise an exception so that it doesn't continue with the pathmaking if the given ID doesn't exist
+# for right now, though, we'll just print a message
+
+if not input_segment_id_found:
+    print("Error: No segment with the given ID")
+
+
+#Begin to generate path.
+#convert input to int
+input_segment_id= int(input_segment_id)
+
+#Look up user input seg id, create column is_input w/true and false
+dfsegs['is_input'] = np.where(dfsegs['id']== input_segment_id, True, False)
+
+#Create new df called dfpath that is populated by all the true values.
+dfpath = dfsegs[dfsegs['is_input'] == True]
+
+#Create the path
+#Set input_toseg to the input_segment_id
+#Does this generate a duplicate of the first segment?
+input_toseg = input_segment_id
+while input_toseg != -1:
+    #find relevant toseg
+    input_toseg=dfpath.loc[dfpath['id']== input_segment_id, 'toseg']
+    #convert to int
+    input_toseg=int(input_toseg)
+    #query dfsegs to find the segment with the same id as toseg
+    dfsegs['is_input'] = np.where(dfsegs['id']== input_toseg, True, False)
+    #take this line ad append it to dfpath
+    dfpath = dfpath.append(dfsegs[dfsegs['is_input'] == True])
+    input_segment_id = input_toseg
+
+#Now have a df that has all the relevant segments, in order moving down path.
+
+#Begin pulling required nodes from segments
+#Create list of relevant segments
+queried_segments = []
+for seg_id in dfpath['id']:
+    queried_segments.append(seg_id)
+
+#Creat list of df entries for relevant nodes in queried_segments
+path_nodes=[]
+for _id in queried_segments:
+    path_nodes.append( segments[_id] )
+
+#Create a df with relevant nodes in path
+dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
+
+dfpath_nodes
