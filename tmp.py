@@ -194,6 +194,7 @@ gdf_segs.to_file('whitewater_river_segments.gpkg', driver="GPKG")
 
 print("Done!")
 
+
 #Generating the geopackage to begin path selection
 print('Now I will create a geopackage to select segments for a path.')
 
