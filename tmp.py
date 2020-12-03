@@ -220,6 +220,7 @@ print('Open in GIS to select your starter segment_ID.')
 
 #Input selected segment_ID. This will be the start of the path.
 input_segment_id = 155
+
 river_name = "Zumbro River"
 
 #Find out if the input segment is in the segments dataframe.
@@ -278,6 +279,7 @@ for _id in queried_segments:
 dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
 dfpath_nodes
+
 # Build Plots
 # Profile of entire network (selected path in black)
 plt.figure()
@@ -342,3 +344,4 @@ plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
         frameon=None, metadata=None)
 
 plt.figure()
+
