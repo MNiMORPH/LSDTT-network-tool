@@ -10,7 +10,7 @@ from shapely.geometry import LineString
 window = 1000 # meters per "reach"
 
 #rp = pd.read_csv('/Users/Shanti/Desktop/Fall_2020/LSDTT-network/LSDTT-network/ww_everything_newDTB.csv', index_col='node')
-rp = pd.read_csv('WW_LSDTTNetwork_chi_outputs_wholewatershed_chi_data_map.csv', index_col='NI')
+rp = pd.read_csv('zum_chi_chi_data_map.csv', index_col='NI', na_filter=False)
 #rp = pd.read_csv('/home/andy/Desktop/Eel_River_Network_testing/Eel_River_DEM_MChiSegmented.csv')
 segment_ids = np.array(list(set(rp['source_key'])))
 
@@ -194,7 +194,6 @@ gdf_segs.to_file('whitewater_river_segments.gpkg', driver="GPKG")
 
 print("Done!")
 
-
 #Generating the geopackage to begin path selection
 print('Now I will create a geopackage to select segments for a path.')
 
@@ -221,6 +220,8 @@ print('Open in GIS to select your starter segment_ID.')
 
 #Input selected segment_ID. This will be the start of the path.
 input_segment_id = 155
+
+river_name = "Zumbro River"
 
 #Find out if the input segment is in the segments dataframe.
 input_segment_id_found = False
@@ -280,29 +281,67 @@ dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 dfpath_nodes
 
 # Build Plots
-
-# Profile of entire network (selected path in red)
+# Profile of entire network (selected path in black)
 plt.figure()
 for segment in segments:
-    plt.plot(segment['flow_distance'], segment['elevation'], 'k-')
-plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['elevation'], 'r-')
+    plt.plot((segment['flow_distance']/1000), segment['elevation'], color= 'gray', linewidth=1)
+plt.title(river_name, fontdict=None, loc='center', pad=None)
+plt.xlabel('Downchannel distance [km]')
+plt.ylabel('Elevation [m]')
+plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
+plt.gca().invert_xaxis()
 
-# Map view of network (selected path in red)
+plt.savefig("AllChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Map view of network (selected path in black)
 plt.figure()
 for segment in segments:
-    plt.plot(segment['longitude'], segment['latitude'])
+    plt.plot(segment['longitude'], segment['latitude'], color= 'grey')
 
-plt.plot(confluences[:,0], confluences[:,1], 'bo')
-plt.plot(mouths[:,0], mouths[:,1], 'ro')
-plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'r-')
+#plt.plot(confluences[:,0], confluences[:,1], 'bo')
+plt.plot(mouths[:,0], mouths[:,1], color= 'grey', linewidth= 1)
+plt.title(river_name, fontdict=None, loc='center', pad=None)
+plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 6)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+plt.savefig("NetworkMap", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
 
 plt.figure()
+
 
 # Map view of the selected path
-plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-')
+plt.title(river_name, fontdict=None, loc='center', pad=None)
+plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 5)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+
+plt.savefig("PathMap", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
 plt.figure()
 
-# Long profile of the selected path
-plt.plot(dfpath_nodes['flow_distance'], dfpath_nodes['elevation'])
 
-plt.show()
+# Long profile of the selected path
+plt.title(river_name, fontdict=None, loc='center', pad=None)
+plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
+plt.xlabel('Downchannel distance [km]')
+plt.ylabel('Elevation [m]')
+plt.gca().invert_xaxis()
+
+plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None, metadata=None)
+
+plt.figure()
+
