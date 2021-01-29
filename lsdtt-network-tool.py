@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit
 import geopandas as gpd
 from shapely.geometry import LineString
 
+# Create possible command line arguments
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
 parser.add_argument("file_input", help="LSDTopoTools csv output used to build the drainage network", type=str)
 parser.add_argument("file_output", help="Filename for the output geopackage", type=str)
@@ -14,6 +15,11 @@ parser.add_argument("--chi", "-c", action="store_true", help="include chi in the
 parser.add_argument("--drainage_area", "-da", action="store_true", help="include drainage area in the output geodatabase")
 parser.add_argument("--elevation", "-e", action="store_true", help="include average, minimum, and maximum elevation in the output geodatabase")
 parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output geodatabase")
+
+# Parse file input and output names.
+# If the output file isn't specified as a geopackage, add the .gpkg file extension
+# TODO: More verification to make sure input and output filenames are valid
+# TODO: Provide the user with the option to output a single file with both the information in the output and segs_select.gkpg
 
 args = parser.parse_args()
 file_input = args.file_input
@@ -167,6 +173,9 @@ for i in range(len(segments)):
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
 dfsegs.insert(len(dfsegs.columns), 'lat', None)
 dfsegs.insert(len(dfsegs.columns), 'lon', None)
+
+# Add additional columns according to the provided command line arguments
+
 if args.slope:
     dfsegs.insert(len(dfsegs.columns), 'slope', None)
 if args.elevation:
