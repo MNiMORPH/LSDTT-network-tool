@@ -1,8 +1,6 @@
 import argparse
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-import matplotlib
 from scipy.optimize import curve_fit
 import geopandas as gpd
 from shapely.geometry import LineString
