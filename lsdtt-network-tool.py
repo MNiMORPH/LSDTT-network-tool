@@ -238,3 +238,13 @@ gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
 
 print('Your geopackage is ready!')
 print('Open in GIS to select your starter segment_ID.')
+
+
+# Export nodes for use of plotting
+dfnodes = pd.concat(segments)
+dfnodes['network_node_type'] = ""
+#for mouth in mouth_nodes:
+#   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
+gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude) )
+gdf_NetworkNodes.to_file('output_nodes')
+print('Node shapefile is ready!')

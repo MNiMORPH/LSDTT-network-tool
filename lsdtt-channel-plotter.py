@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 
 #Argparse arguments. Use segs_select.gpkg for the input file, as we need a geopackage with both segment id and toseg.
 parser = argparse.ArgumentParser(description='Plot channel long profile and map view using a provided segment id.')
-parser.add_argument("input_file", help="geopackage file with segment ids (most likely 'segs_select.gpkg')")
+parser.add_argument("input_segments", help="geopackage file with segment ids (most likely 'segs_select.gpkg')")
+parser.add_argument("input_nodes", help="geopackage file with segment ids (most likely 'segs_select.gpkg')")
 parser.add_argument("input_segment_id", help="segment id of the desired channel", type=int)
 parser.add_argument("river_name", help="name of the river (used for title of plots)", type=str)
 
@@ -14,9 +15,11 @@ args = parser.parse_args()
 #Input selected segment_ID. This will be the start of the path.
 input_segment_id = args.input_segment_id
 
-input_file = args.input_file
+input_segments = args.input_segments
+input_nodes = args.input_nodes
 river_name = args.river_name
-dfsegs = gpd.read_file(input_file)
+dfsegs = gpd.read_file(input_segments)
+dfnodes = gpd.read_file(input_nodes)
 
 #Find out if the input segment is in the segments dataframe.
 input_segment_id_found = False
@@ -66,22 +69,21 @@ while input_toseg != -1:
 queried_segments = []
 for seg_id in dfpath['segment_ID']:
     queried_segments.append(seg_id)
-print(queried_segments)
 
-#END OF CURRENTLY WORKING CODE
-'''
 #Create list of df entries for relevant nodes in queried_segments
 path_nodes=[]
 for _id in queried_segments:
-    path_nodes.append( segments[_id] )
+    path_nodes.append(dfnodes[dfnodes['segment_id'] == _id] )
+print(path_nodes)
 
 #Create a df with relevant nodes in path
 dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
-dfpath_nodes
+#dfpath_nodes
 
 # Build Plots
 # Profile of entire network (selected path in black)
+'''
 plt.figure()
 for segment in segments:
     plt.plot((segment['flow_distance']/1000), segment['elevation'], color= 'gray', linewidth=1)
@@ -115,7 +117,8 @@ plt.savefig("NetworkMap", dpi=300, facecolor='w', edgecolor='w',
 
 plt.figure()
 
-
+'''
+print(dfpath_nodes)
 # Map view of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 5)
@@ -133,7 +136,7 @@ plt.figure()
 
 # Long profile of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
+plt.plot((dfpath_nodes['flow_dista']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
 plt.xlabel('Downchannel distance [km]')
 plt.ylabel('Elevation [m]')
 plt.gca().invert_xaxis()
@@ -144,5 +147,3 @@ plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
         frameon=None, metadata=None)
 
 plt.figure()
-
-'''
