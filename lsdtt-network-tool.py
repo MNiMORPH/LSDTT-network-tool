@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 import argparse
 import pandas as pd
 import numpy as np
@@ -25,7 +27,11 @@ file_output = args.file_output
 if file_output[-5:] != '.gpkg':
     file_output += '.gpkg'
 
+# Read the LSDTopoTools river chi profile inputs, indexing by the 
+# node index
 rp = pd.read_csv(file_input, index_col='NI', na_filter=False)
+# The "source key" sets the ID for each segment -- section of channel between
+# tributary junctions.
 segment_ids = np.array(list(set(rp['source_key'])))
 
 # Get the source key for all receiver nodes
