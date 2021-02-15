@@ -76,6 +76,7 @@ for seg_id in dfpath['segment_ID']:
 path_nodes=[]
 for _id in queried_segments:
     path_nodes.append(dfnodes[dfnodes['segment_id'] == _id] )
+print(path_nodes)
 
 #Create a df with relevant nodes in path
 dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
@@ -84,9 +85,10 @@ dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
 # Build Plots
 # Profile of entire network (selected path in black)
+'''
 plt.figure()
-for seg, nodes_segs in dfnodes.groupby('segment_id'):
-    plt.plot((nodes_segs['flow_distance']/1000), nodes_segs['elevation'], color= 'gray', linewidth=1)
+for segment in segments:
+    plt.plot((segment['flow_distance']/1000), segment['elevation'], color= 'gray', linewidth=1)
 plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.xlabel('Downchannel distance [km]')
 plt.ylabel('Elevation [m]')
@@ -100,11 +102,11 @@ plt.savefig("AllChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
 
 # Map view of network (selected path in black)
 plt.figure()
-for seg, nodes_segs in dfnodes.groupby('segment_id'):
-    plt.plot(nodes_segs['longitude'], nodes_segs['latitude'], color= 'grey')
+for segment in segments:
+    plt.plot(segment['longitude'], segment['latitude'], color= 'grey')
 
 #plt.plot(confluences[:,0], confluences[:,1], 'bo')
-#plt.plot(mouths[:,0], mouths[:,1], color= 'grey', linewidth= 1)
+plt.plot(mouths[:,0], mouths[:,1], color= 'grey', linewidth= 1)
 plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 6)
 plt.xlabel('Longitude')
@@ -117,7 +119,8 @@ plt.savefig("NetworkMap", dpi=300, facecolor='w', edgecolor='w',
 
 plt.figure()
 
-plt.figure()
+'''
+print(dfpath_nodes)
 # Map view of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.plot(dfpath_nodes['longitude'], dfpath_nodes['latitude'], 'k-', linewidth= 5)
@@ -135,7 +138,7 @@ plt.figure()
 
 # Long profile of the selected path
 plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
+plt.plot((dfpath_nodes['flow_dista']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
 plt.xlabel('Downchannel distance [km]')
 plt.ylabel('Elevation [m]')
 plt.gca().invert_xaxis()
