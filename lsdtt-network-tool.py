@@ -252,5 +252,5 @@ dfnodes['network_node_type'] = ""
 #for mouth in mouth_nodes:
 #   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
 gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude) )
-gdf_NetworkNodes.to_file('output_nodes')
+gdf_NetworkNodes.to_file('output_nodes.gpkg', driver="GPKG")
 print('Node shapefile is ready!')
