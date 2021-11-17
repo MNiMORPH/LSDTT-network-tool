@@ -296,7 +296,7 @@ print("Segments written to", file_output)
 print('Now I will create a geopackage to select segments for a path.')
 
 #Creating df to be used to select segment for path
-dfsegsselect= pd.DataFrame ({'segment_ID':segment_ids, 'toseg':toseg})
+dfsegsselect= pd.DataFrame ({'id':segment_ids, 'toseg':toseg})
 
 # Create a set of LineString objects to be used for selection
 stream_lines_select = []
