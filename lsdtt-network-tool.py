@@ -13,7 +13,7 @@ parser.add_argument("file_input", help='LSDTopoTools "*_MChiBasic.csv" output us
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
 parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
-parser.add_argument("--elevation", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
+parser.add_argument("--elevations", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
 parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
 
 # Parse file input and output names.
@@ -26,6 +26,21 @@ file_input = args.file_input
 file_output = args.file_output
 if file_output[-5:] != '.gpkg':
     file_output += '.gpkg'
+    
+# Let's add some methods to write args to local vars
+_write_segment_chi = args.chi
+_write_segment_drainage_area = args.drainage_area
+_write_segment_slope = args.slope
+_write_segment_elevations = args.elevations
+
+    
+# Temporary, for local testing
+file_input='GooseberryRiver_MChiBasic.csv'
+file_output='GooseberryNetworkTest20211117_2'
+_write_segment_chi = False
+_write_segment_drainage_area = True
+_write_segment_slope = True
+_write_segment_elevations = True
 
 # Read the LSDTopoTools river chi profile inputs, indexing by the 
 # node index
@@ -180,30 +195,30 @@ dfsegs.insert(len(dfsegs.columns), 'lon', None)
 
 # Add additional columns according to the provided command line arguments
 
-if args.slope:
+if _write_segment_slope:
     dfsegs.insert(len(dfsegs.columns), 'slope', None)
-if args.elevation:
+if _write_segment_elevations:
     dfsegs.insert(len(dfsegs.columns), 'max_elev', None)
     dfsegs.insert(len(dfsegs.columns), 'min_elev', None)
     dfsegs.insert(len(dfsegs.columns), 'average_elev', None)
-if args.drainage_area:
+if _write_segment_drainage_area:
     dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
-if args.chi:
+if _write_segment_chi:
     dfsegs.insert(len(dfsegs.columns), 'chi', None)
 #dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
 for i in range(len(segments)):
     segment = segments[i]
-    if args.slope:
+    if _write_segment_slope:
         dfsegs['slope'][i] = (np.max(segment['elevation']) - np.min(segment['elevation'])) / \
                          ( np.max(segment['flow_distance']) \
                            - np.min(segment['flow_distance']) )
-    if args.elevation:
+    if _write_segment_elevations:
         dfsegs['average_elev'][i] = (np.max(segment['elevation']) + np.min(segment['elevation'])) / 2
         dfsegs['max_elev'][i] = (np.max(segment['elevation']))
         dfsegs['min_elev'][i] = (np.min(segment['elevation']))
-    if args.drainage_area:
+    if _write_segment_drainage_area:
         dfsegs['drainage_area_km2'][i] = np.mean(segment['drainage_area'])/1E6
-    if args.chi:
+    if _write_segment_chi:
         dfsegs['chi'][i] = np.mean(segment['chi'])
     # These are going to be particular to this case
     #dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
