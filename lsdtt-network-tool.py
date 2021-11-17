@@ -9,7 +9,7 @@ from shapely.geometry import LineString
 
 # Create possible command line arguments
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
-parser.add_argument("file_input", help='LSDTopoTools "*_MChiBasic.csv" output used to build the drainage network', type=str)
+parser.add_argument("file_input", help='LSDTopoTools "*_MChiSegmented.csv" output used to build the drainage network', type=str)
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
 parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
@@ -33,14 +33,16 @@ _write_segment_drainage_area = args.drainage_area
 _write_segment_slope = args.slope
 _write_segment_elevations = args.elevations
 
-    
+
+"""    
 # Temporary, for local testing
-file_input='GooseberryRiver_MChiBasic.csv'
+file_input='GooseberryRiver_MChiSegmented.csv'
 file_output='GooseberryNetworkTest20211117_2'
 _write_segment_chi = False
 _write_segment_drainage_area = True
 _write_segment_slope = True
 _write_segment_elevations = True
+"""    
 
 # Read the LSDTopoTools river chi profile inputs, indexing by the 
 # node index
