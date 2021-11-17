@@ -7,8 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 parser = argparse.ArgumentParser(description='Plot channel long profile and map view, higlighting a channel starting from a provided segment id.')
-parser.add_argument("input_segments", help="geopackage file with segments (output from lsdtt-network-tool)")
-parser.add_argument("input_nodes", help="geopackage file with nodes (output from lsdtt-network-tool)")
+parser.add_argument("input_segments", help="geopackage file with segments (output from lsdtt-network-tool)", type=str)
+parser.add_argument("input_nodes", help="geopackage file with nodes (output from lsdtt-network-tool)", type=str)
 parser.add_argument("input_segment_id", help="segment id of the desired channel", type=int)
 parser.add_argument("river_name", help="name of the river (used for title of plots)", type=str)
 
