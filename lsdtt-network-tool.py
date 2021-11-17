@@ -37,7 +37,7 @@ _write_segment_elevations = args.elevations
 """    
 # Temporary, for local testing
 file_input='GooseberryRiver_MChiSegmented.csv'
-file_output='GooseberryNetworkTest20211117_3.gpkg'
+file_output='GooseberryNetworkTest20211117_4.gpkg'
 _write_segment_chi = False
 _write_segment_drainage_area = True
 _write_segment_slope = True
@@ -210,7 +210,7 @@ if _write_segment_elevations:
     _min = []
     _mean = []
     for segment in segments:
-        _mean.append((np.max(segment['elevation']) + np.min(segment['elevation'])) / 2)
+        _mean.append(np.mean(segment['elevation']))
         _max.append(np.max(segment['elevation']))
         _min.append(np.min(segment['elevation']))
     dfsegs['z_mean'] = _mean
