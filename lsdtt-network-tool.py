@@ -12,11 +12,13 @@ import os
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
 parser.add_argument("file_input", help='LSDTopoTools "*_MChiSegmented.csv" output used to build the drainage network', type=str)
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
+parser.add_argument("--basin_key", help='Integer value of the basin from which you want to extract the streams, as given by "*_MChiSegmented.csv" in LSDTT', type=str)
+parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
 parser.add_argument("--node_export", "-n", action="store_true", help="export all nodes (points) as well as the line network: may take a while")
-parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
 parser.add_argument("--elevations", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
-parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
+parser.add_argument("--ksn", action="store_true", help="include normalized steepness index in the output, *assuming this = m_chi from LSDTT*")
+parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 
 # Parse file input and output names.
 # If the output file isn't specified as a geopackage, add the .gpkg file extension
@@ -37,9 +39,13 @@ _write_segment_chi = args.chi
 _write_segment_drainage_area = args.drainage_area
 _write_segment_slope = args.slope
 _write_segment_elevations = args.elevations
-_export_all_nodes = args.node_export
+_write_ksn = args.ksn
 
-# And give the nodes' output filename
+# Basin key selected?
+_basin_id = args.basin_key
+
+# And give the nodes' output filename if needed
+_export_all_nodes = args.node_export
 if _export_all_nodes:
     file_output_nodes = os.path.splitext(file_output)[0] + '_nodes' + '.gpkg'
 
@@ -68,6 +74,10 @@ rp.insert(len(rp.columns), 'receiver_source_key', None)
 #for _node in rp.index:
 # IMPORTANT FOR EFFICIENCY: MINIMIZE THE NUMBER OF TIMES YOU UPDATE THE
 # DATAFRAME
+
+# Limit to a single basin if so desired
+if _basin_id:
+    rp = rp[rp['basin_key'] == _basin_id]
 
 _tmplist = []
 for _node in rp.index:
@@ -252,6 +262,11 @@ if _write_segment_chi:
         _out.append(np.mean(segment['chi']))
     dfsegs['chi'] = _out
 
+if _write_ksn:
+    _out = []
+    for segment in segments:
+        _out.append(np.mean(segment['m_chi']))
+    dfsegs['ksn'] = _out
 
 ################################################################
 # Find a way in the future to add custom values to the columns #
@@ -274,8 +289,9 @@ gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines, crs="EPSG:4326")
 # Save to GeoPackage
 gdf_segs.to_file(file_output, driver="GPKG")
 
-print("Done!")
+print("Segments written to", file_output)
 
+"""
 #Generating the geopackage to begin path selection
 print('Now I will create a geopackage to select segments for a path.')
 
@@ -290,7 +306,6 @@ for segment in segments:
 
 gdf_segsselect = gpd.GeoDataFrame( dfsegsselect, geometry=stream_lines_select )
 
-"""
 # Save to GeoPackage
 # Not really necessary now that we have the full output
 gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
