@@ -6,11 +6,13 @@ import numpy as np
 from scipy.optimize import curve_fit
 import geopandas as gpd
 from shapely.geometry import LineString
+import os
 
 # Create possible command line arguments
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
 parser.add_argument("file_input", help='LSDTopoTools "*_MChiSegmented.csv" output used to build the drainage network', type=str)
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
+parser.add_argument("--node_export", "-n", action="store_true", help="export all nodes (points) as well as the line network: may take a while")
 parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
 parser.add_argument("--elevations", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
@@ -22,17 +24,24 @@ parser.add_argument("--slope", "-s", action="store_true", help="include slope in
 # TODO: Provide the user with the option to output a single file with both the information in the output and segs_select.gkpg
 
 args = parser.parse_args()
+
 file_input = args.file_input
 file_output = args.file_output
+
+# Could use OS, but this seems just fine
 if file_output[-5:] != '.gpkg':
     file_output += '.gpkg'
-    
+
 # Let's add some methods to write args to local vars
 _write_segment_chi = args.chi
 _write_segment_drainage_area = args.drainage_area
 _write_segment_slope = args.slope
 _write_segment_elevations = args.elevations
+_export_all_nodes = args.node_export
 
+# And give the nodes' output filename
+if _export_all_nodes:
+    file_output_nodes = os.path.splitext(file_output)[0] + '_nodes' + '.gpkg'
 
 """    
 # Temporary, for local testing
@@ -291,11 +300,13 @@ print('Open in GIS to select your starter segment_ID.')
 """
 
 
-# Export nodes for use of plotting
-dfnodes = pd.concat(segments)
-dfnodes['network_node_type'] = ""
-#for mouth in mouth_nodes:
-#   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
-gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude), crs="EPSG:4326")
-gdf_NetworkNodes.to_file('output_nodes.gpkg', driver="GPKG")
-print('Node shapefile is ready!')
+if _export_all_nodes:
+    print("Exporting all nodes; this may take some time")
+    # Export nodes for use of plotting
+    dfnodes = pd.concat(segments)
+    dfnodes['network_node_type'] = ""
+    #for mouth in mouth_nodes:
+    #   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
+    gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude), crs="EPSG:4326")
+    gdf_NetworkNodes.to_file(file_output_nodes, driver="GPKG")
+
