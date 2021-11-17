@@ -9,12 +9,12 @@ from shapely.geometry import LineString
 
 # Create possible command line arguments
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
-parser.add_argument("file_input", help="LSDTopoTools csv output used to build the drainage network", type=str)
-parser.add_argument("file_output", help="Filename for the output geopackage", type=str)
-parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output geodatabase")
-parser.add_argument("--drainage_area", "-da", action="store_true", help="include drainage area in the output geodatabase")
-parser.add_argument("--elevation", "-e", action="store_true", help="include average, minimum, and maximum elevation in the output geodatabase")
-parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output geodatabase")
+parser.add_argument("file_input", help='LSDTopoTools "*_MChiBasic.csv" output used to build the drainage network', type=str)
+parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
+parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
+parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
+parser.add_argument("--elevation", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
+parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
 
 # Parse file input and output names.
 # If the output file isn't specified as a geopackage, add the .gpkg file extension
