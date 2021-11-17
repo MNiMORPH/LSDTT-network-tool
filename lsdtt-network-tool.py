@@ -37,7 +37,7 @@ _write_segment_elevations = args.elevations
 """    
 # Temporary, for local testing
 file_input='GooseberryRiver_MChiSegmented.csv'
-file_output='GooseberryNetworkTest20211117_2'
+file_output='GooseberryNetworkTest20211117_3.gpkg'
 _write_segment_chi = False
 _write_segment_drainage_area = True
 _write_segment_slope = True
@@ -195,33 +195,41 @@ dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
 dfsegs.insert(len(dfsegs.columns), 'lat', None)
 dfsegs.insert(len(dfsegs.columns), 'lon', None)
 
-# Add additional columns according to the provided command line arguments
+
+# Add columns as selected via flags
 
 if _write_segment_slope:
-    dfsegs.insert(len(dfsegs.columns), 'slope', None)
+    _out = []
+    for segment in segments:
+        _out.append( (np.max(segment['elevation']) - np.min(segment['elevation'])) /
+                     (np.max(segment['flow_distance']) - np.min(segment['flow_distance'])) )
+    dfsegs['slope'] = _out
+
 if _write_segment_elevations:
-    dfsegs.insert(len(dfsegs.columns), 'max_elev', None)
-    dfsegs.insert(len(dfsegs.columns), 'min_elev', None)
-    dfsegs.insert(len(dfsegs.columns), 'average_elev', None)
+    _max = []
+    _min = []
+    _mean = []
+    for segment in segments:
+        _mean.append((np.max(segment['elevation']) + np.min(segment['elevation'])) / 2)
+        _max.append(np.max(segment['elevation']))
+        _min.append(np.min(segment['elevation']))
+    dfsegs['z_mean'] = _mean
+    dfsegs['z_max'] = _max
+    dfsegs['z_min'] = _min
+    
 if _write_segment_drainage_area:
-    dfsegs.insert(len(dfsegs.columns), 'drainage_area_km2', None)
+    _out = []
+    for segment in segments:
+        _out.append(np.mean(segment['drainage_area'])/1E6)
+    dfsegs['drainage_area_km2'] = _out
+
 if _write_segment_chi:
-    dfsegs.insert(len(dfsegs.columns), 'chi', None)
-#dfsegs.insert(len(dfsegs.columns), 'depth_to_bedrock_m', None)
-for i in range(len(segments)):
-    segment = segments[i]
-    if _write_segment_slope:
-        dfsegs['slope'][i] = (np.max(segment['elevation']) - np.min(segment['elevation'])) / \
-                         ( np.max(segment['flow_distance']) \
-                           - np.min(segment['flow_distance']) )
-    if _write_segment_elevations:
-        dfsegs['average_elev'][i] = (np.max(segment['elevation']) + np.min(segment['elevation'])) / 2
-        dfsegs['max_elev'][i] = (np.max(segment['elevation']))
-        dfsegs['min_elev'][i] = (np.min(segment['elevation']))
-    if _write_segment_drainage_area:
-        dfsegs['drainage_area_km2'][i] = np.mean(segment['drainage_area'])/1E6
-    if _write_segment_chi:
-        dfsegs['chi'][i] = np.mean(segment['chi'])
+    _out = []
+    for segment in segments:
+        _out.append(np.mean(segment['chi']))
+    dfsegs['chi'] = _out
+
+
     # These are going to be particular to this case
     #dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
     #dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
