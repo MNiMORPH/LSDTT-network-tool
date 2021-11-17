@@ -281,11 +281,14 @@ for segment in segments:
 
 gdf_segsselect = gpd.GeoDataFrame( dfsegsselect, geometry=stream_lines_select )
 
+"""
 # Save to GeoPackage
+# Not really necessary now that we have the full output
 gdf_segsselect.to_file('segs_select.gpkg', driver="GPKG")
 
 print('Your geopackage is ready!')
 print('Open in GIS to select your starter segment_ID.')
+"""
 
 
 # Export nodes for use of plotting
