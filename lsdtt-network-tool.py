@@ -260,7 +260,7 @@ for segment in segments:
                             segment.loc[:, ('longitude', 'latitude', 'elevation')].values ) )
 
 # Now convert to geopandas
-gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines )
+gdf_segs = gpd.GeoDataFrame( dfsegs, geometry=stream_lines, crs="EPSG:4326")
 
 # Save to GeoPackage
 gdf_segs.to_file(file_output, driver="GPKG")
@@ -293,6 +293,6 @@ dfnodes = pd.concat(segments)
 dfnodes['network_node_type'] = ""
 #for mouth in mouth_nodes:
 #   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
-gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude) )
+gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude), crs="EPSG:4326")
 gdf_NetworkNodes.to_file('output_nodes.gpkg', driver="GPKG")
 print('Node shapefile is ready!')
