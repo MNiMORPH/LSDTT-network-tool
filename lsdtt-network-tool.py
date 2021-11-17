@@ -29,7 +29,7 @@ if file_output[-5:] != '.gpkg':
 
 # Read the LSDTopoTools river chi profile inputs, indexing by the 
 # node index
-rp = pd.read_csv(file_input, index_col='NI', na_filter=False)
+rp = pd.read_csv(file_input, index_col='node', na_filter=False)
 # The "source key" sets the ID for each segment -- section of channel between
 # tributary junctions.
 segment_ids = np.array(list(set(rp['source_key'])))
@@ -45,7 +45,7 @@ rp.insert(len(rp.columns), 'receiver_source_key', None)
 
 _tmplist = []
 for _node in rp.index:
-    _receiver_node = rp.loc[_node, 'receiver_NI']
+    _receiver_node = rp.loc[_node, 'receiver_node']
     if _receiver_node in rp.index and _node != _receiver_node:
         _receiver_source_key = rp.loc[_receiver_node, 'source_key']
     else:
@@ -61,7 +61,7 @@ mouth_nodes = list(rp[rp['receiver_source_key'] == -1].index)
 
 # Next, identify these confluences by places where the receiver_source_key
 # differs from the source_key
-confluence_downstream_nodes = list(set(list(rp['receiver_NI']
+confluence_downstream_nodes = list(set(list(rp['receiver_node']
                                                   [rp['source_key'] !=
                                                   rp['receiver_source_key']])))
 # Remove river mouths
@@ -112,9 +112,9 @@ termination_nodes = np.hstack(( confluence_downstream_nodes, mouth_nodes ))
 segments_nodes = []
 for _source_node in source_nodes:
     segment_nodes = [_source_node]
-    segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_NI'])
+    segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_node'])
     while segment_nodes[-1] not in termination_nodes:
-        segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_NI'])
+        segment_nodes.append(rp.loc[segment_nodes[-1], 'receiver_node'])
     segments_nodes.append(segment_nodes)
 
 # Next, reconstruct the data table elements for each of these points
