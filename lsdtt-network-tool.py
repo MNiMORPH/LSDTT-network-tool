@@ -12,9 +12,9 @@ import os
 parser = argparse.ArgumentParser(description='build a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions.')
 parser.add_argument("file_input", help='LSDTopoTools "*_MChiSegmented.csv" output used to build the drainage network', type=str)
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
-parser.add_argument("--basin_key", help='Integer value of the basin from which you want to extract the streams, as given by "*_MChiSegmented.csv" in LSDTT', type=str)
-parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
+parser.add_argument("--basin_key", help='Integer value of the basin from which you want to extract the streams, as given by "*_MChiSegmented.csv" in LSDTT', type=int)
 parser.add_argument("--node_export", "-n", action="store_true", help="export all nodes (points) as well as the line network: may take a while")
+parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
 parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
 parser.add_argument("--elevations", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
 parser.add_argument("--ksn", action="store_true", help="include normalized steepness index in the output, *assuming this = m_chi from LSDTT*")
@@ -57,6 +57,9 @@ _write_segment_chi = False
 _write_segment_drainage_area = True
 _write_segment_slope = True
 _write_segment_elevations = True
+_basin_id = 8
+_write_ksn = True
+_export_all_nodes = True
 """    
 
 # Read the LSDTopoTools river chi profile inputs, indexing by the 
