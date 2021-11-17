@@ -192,12 +192,26 @@ for i in range(len(segments)):
 
 
 dfsegs = pd.DataFrame({'id': segment_ids, 'toseg': toseg})
-dfsegs.insert(len(dfsegs.columns), 'lat', None)
-dfsegs.insert(len(dfsegs.columns), 'lon', None)
 
 
-# Add columns as selected via flags
+############################
+# Add mean lat/lon columns #
+############################
 
+_out = []
+for segment in segments:
+    _out.append( segment['longitude'].mean() )
+dfsegs['longitude (mean)'] = _out
+
+_out = []
+for segment in segments:
+    _out.append( segment['latitude'].mean() )
+dfsegs['latitude (mean)'] = _out
+
+
+#####################################
+# Add columns as selected via flags #
+#####################################
 if _write_segment_slope:
     _out = []
     for segment in segments:
@@ -213,7 +227,7 @@ if _write_segment_elevations:
         _mean.append(np.mean(segment['elevation']))
         _max.append(np.max(segment['elevation']))
         _min.append(np.min(segment['elevation']))
-    dfsegs['z_mean'] = _mean
+    dfsegs['z mean'] = _mean
     dfsegs['z_max'] = _max
     dfsegs['z_min'] = _min
     
@@ -221,7 +235,7 @@ if _write_segment_drainage_area:
     _out = []
     for segment in segments:
         _out.append(np.mean(segment['drainage_area'])/1E6)
-    dfsegs['drainage_area_km2'] = _out
+    dfsegs['drainage area (mean) [km2]'] = _out
 
 if _write_segment_chi:
     _out = []
@@ -230,10 +244,13 @@ if _write_segment_chi:
     dfsegs['chi'] = _out
 
 
-    # These are going to be particular to this case
-    #dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
-    #dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
+################################################################
+# Find a way in the future to add custom values to the columns #
+################################################################
 
+# These are going to be particular to this case
+#dfsegs['depth_to_bedrock_m'][i] = np.mean(segment['depth_to_bedrock'])
+#dfsegs['bedrock_lithology'] = np.mean(segment['depth_to_bedrock'])
 
 
 # Create a set of LineString objects
