@@ -16,16 +16,23 @@ parser.add_argument("river_name", help="name of the river (used for title of plo
 args = parser.parse_args()
 #Input selected segment_ID. This will be the start of the path.
 input_segment_id = args.input_segment_id
-
 input_segments = args.input_segments
 input_nodes = args.input_nodes
 river_name = args.river_name
+
+"""
+input_segments = 'GooseberryNetworkTest20211117_6.gpkg'
+input_nodes = 'GooseberryNetworkTest20211117_6_nodes.gpkg'
+input_segment_id = 236
+river_name = 'Gooseberry'
+"""
+
 dfsegs = gpd.read_file(input_segments)
 dfnodes = gpd.read_file(input_nodes)
 
 #Find out if the input segment is in the segments dataframe.
 input_segment_id_found = False
-for seg_id in dfsegs['segment_ID']:
+for seg_id in dfsegs['id']:
     if seg_id == input_segment_id:
         input_segment_id_found = True
         print("Segment ID found.")
@@ -42,7 +49,7 @@ if not input_segment_id_found:
 input_segment_id= int(input_segment_id)
 
 #Look up user input seg id, create column is_input w/true and false
-dfsegs['is_input'] = np.where(dfsegs['segment_ID']== input_segment_id, True, False)
+dfsegs['is_input'] = np.where(dfsegs['id']== input_segment_id, True, False)
 
 #Create new df called dfpath that is populated by all the true values.
 dfpath = dfsegs[dfsegs['is_input'] == True]
@@ -54,11 +61,11 @@ dfpath = dfsegs[dfsegs['is_input'] == True]
 input_toseg = input_segment_id
 while input_toseg != -1:
     #find relevant toseg
-    input_toseg=dfpath.loc[dfpath['segment_ID']== input_segment_id, 'toseg']
+    input_toseg=dfpath.loc[dfpath['id']== input_segment_id, 'toseg']
     #convert to int
     input_toseg=int(input_toseg)
     #query dfsegs to find the segment with the same id as toseg
-    dfsegs['is_input'] = np.where(dfsegs['segment_ID']== input_toseg, True, False)
+    dfsegs['is_input'] = np.where(dfsegs['id']== input_toseg, True, False)
     #take this line ad append it to dfpath
     dfpath = dfpath.append(dfsegs[dfsegs['is_input'] == True])
     input_segment_id = input_toseg
@@ -69,7 +76,7 @@ while input_toseg != -1:
 #Begin pulling required nodes from segments
 #Create list of relevant segments
 queried_segments = []
-for seg_id in dfpath['segment_ID']:
+for seg_id in dfpath['id']:
     queried_segments.append(seg_id)
 
 #Create list of df entries for relevant nodes in queried_segments
