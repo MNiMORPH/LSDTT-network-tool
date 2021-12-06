@@ -88,6 +88,20 @@ dfpath_nodes = pd.concat(path_nodes, ignore_index=True)
 
 #dfpath_nodes
 
+
+
+plt.figure()
+for seg, nodes_segs in dfnodes.groupby('segment_id'):
+    plt.plot((nodes_segs['flow_distance']/1000), nodes_segs['elevation'], color= 'gray', linewidth=1)
+plt.title(river_name, fontdict=None, loc='center', pad=None)
+plt.xlabel('Downchannel distance [km]')
+plt.ylabel('Elevation [m]')
+#plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
+plt.scatter((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], c=np.log10(dfpath_nodes['m_chi']), cmap='magma')
+plt.gca().invert_xaxis()
+plt.show()
+
+
 # Build Plots
 # Profile of entire network (selected path in black)
 plt.figure()
