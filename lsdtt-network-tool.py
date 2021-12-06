@@ -294,6 +294,30 @@ gdf_segs.to_file(file_output, driver="GPKG")
 
 print("Segments written to", file_output)
 
+
+"""
+#############################################################################
+# If we subdivide the network further, we could make it better for plotting #
+#############################################################################
+
+subseg_target_length = 200.
+
+seg_length = segment['flow_distance'].max() - segment['flow_distance'].min()
+n_subseg = int(np.round(seg_length/subseg_target_length))
+l_subseg_target2 = seg_length / n_subseg
+
+# The last one might be a bit longer, but it's just for plotting.
+subsegs = []
+for i in range(n_subseg-1):
+    _dist = segment['flow_distance'] - segment['flow_distance'].min()
+    subsegs.append( segment[ (_dist >= (subseg_target_length*i))
+                             & (_dist < (subseg_target_length*(i+1))) ] )
+subsegs.append( segment[ _dist >= subseg_target_length*(i+1)] )
+
+    segment['flow_distance'].max()
+"""
+
+
 """
 #Generating the geopackage to begin path selection
 print('Now I will create a geopackage to select segments for a path.')
