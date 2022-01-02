@@ -90,6 +90,16 @@ for seg_id in dfpath['id']:
     queried_segments.append(seg_id)
 
 #Create list of df entries for relevant nodes in queried_segments
+"""
+# Approach querying the network
+path_nodes=[]
+for _id in queried_segments:
+    _seg = dfsegs.geometry[dfsegs['id'] == _id]
+    _xyz = np.array(_seg[_seg.index[0]].coords[:])
+    _
+"""
+    
+# Approach with nodes already printed
 path_nodes=[]
 for _id in queried_segments:
     path_nodes.append(dfnodes[dfnodes['segment_id'] == _id] )
