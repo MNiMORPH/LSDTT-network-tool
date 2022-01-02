@@ -14,11 +14,6 @@ parser.add_argument("file_input", help='LSDTopoTools "*_MChiSegmented.csv" outpu
 parser.add_argument("file_output", help="Filename for the output geopackage of stream segments", type=str)
 parser.add_argument("--basin_key", help='Integer value of the basin from which you want to extract the streams, as given by "*_MChiSegmented.csv" in LSDTT', type=int)
 parser.add_argument("--node_export", "-n", action="store_true", help="export all nodes (points) as well as the line network: may take a while")
-parser.add_argument("--slope", "-s", action="store_true", help="include slope in the output")
-parser.add_argument("--drainage_area", "-a", action="store_true", help="include drainage area in the output")
-parser.add_argument("--elevations", "-e", action="store_true", help="include mean, minimum, and maximum elevation in the output")
-parser.add_argument("--ksn", action="store_true", help="include normalized steepness index in the output, *assuming this = m_chi from LSDTT*")
-parser.add_argument("--chi", "-c", action="store_true", help="include chi in the output")
 
 # Parse file input and output names.
 # If the output file isn't specified as a geopackage, add the .gpkg file extension
@@ -33,13 +28,6 @@ file_output = args.file_output
 # Could use OS, but this seems just fine
 if file_output[-5:] != '.gpkg':
     file_output += '.gpkg'
-
-# Let's add some methods to write args to local vars
-_write_segment_chi = args.chi
-_write_segment_drainage_area = args.drainage_area
-_write_segment_slope = args.slope
-_write_segment_elevations = args.elevations
-_write_ksn = args.ksn
 
 # Basin key selected?
 _basin_id = args.basin_key
@@ -231,45 +219,47 @@ for segment in segments:
 dfsegs['latitude (mean)'] = _out
 
 
-#####################################
-# Add columns as selected via flags #
-#####################################
-if _write_segment_slope:
-    _out = []
-    for segment in segments:
-        _out.append( (np.max(segment['elevation']) - np.min(segment['elevation'])) /
-                     (np.max(segment['flow_distance']) - np.min(segment['flow_distance'])) )
-    dfsegs['slope'] = _out
+###############
+# Add columns #
+###############
 
-if _write_segment_elevations:
-    _max = []
-    _min = []
-    _mean = []
-    for segment in segments:
-        _mean.append(np.mean(segment['elevation']))
-        _max.append(np.max(segment['elevation']))
-        _min.append(np.min(segment['elevation']))
-    dfsegs['z mean'] = _mean
-    dfsegs['z_max'] = _max
-    dfsegs['z_min'] = _min
+# Segment slope
+_out = []
+for segment in segments:
+    _out.append( (np.max(segment['elevation']) - np.min(segment['elevation'])) /
+                 (np.max(segment['flow_distance']) - np.min(segment['flow_distance'])) )
+dfsegs['slope'] = _out
+
+# Segment elevations:
+_max = []
+_min = []
+_mean = []
+for segment in segments:
+    _mean.append(np.mean(segment['elevation']))
+    _max.append(np.max(segment['elevation']))
+    _min.append(np.min(segment['elevation']))
+dfsegs['z mean'] = _mean
+dfsegs['z_max'] = _max
+dfsegs['z_min'] = _min
     
-if _write_segment_drainage_area:
-    _out = []
-    for segment in segments:
-        _out.append(np.mean(segment['drainage_area'])/1E6)
-    dfsegs['drainage area (mean) [km2]'] = _out
+# Segment drainage area (mean across segment)
+_out = []
+for segment in segments:
+    _out.append(np.mean(segment['drainage_area'])/1E6)
+dfsegs['drainage area (mean) [km2]'] = _out
 
-if _write_segment_chi:
-    _out = []
-    for segment in segments:
-        _out.append(np.mean(segment['chi']))
-    dfsegs['chi'] = _out
+# Segment chi (mean across segment)
+_out = []
+for segment in segments:
+    _out.append(np.mean(segment['chi']))
+dfsegs['chi'] = _out
 
-if _write_ksn:
-    _out = []
-    for segment in segments:
-        _out.append(np.mean(segment['m_chi']))
-    dfsegs['ksn'] = _out
+# Segment normalized steepness index, *assuming this = m_chi from LSDTT*
+# (This is true for the default A_0 = 1)
+_out = []
+for segment in segments:
+    _out.append(np.mean(segment['m_chi']))
+dfsegs['ksn'] = _out
 
 ################################################################
 # Find a way in the future to add custom values to the columns #
