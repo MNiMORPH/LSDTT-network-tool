@@ -6,18 +6,29 @@ import geopandas as gpd
 import numpy as np
 from matplotlib import pyplot as plt
 
-parser = argparse.ArgumentParser(description='Plot channel long profile and map view, higlighting a channel starting from a provided segment id.')
-parser.add_argument("input_segments", help="geopackage file with segments (output from lsdtt-network-tool)", type=str)
-parser.add_argument("input_nodes", help="geopackage file with nodes (output from lsdtt-network-tool)", type=str)
-parser.add_argument("input_segment_id", help="segment id of the desired channel", type=int)
-parser.add_argument("river_name", help="name of the river (used for title of plots)", type=str)
+##########
+# PARSER #
+##########
+
+# INPUT
+parser = argparse.ArgumentParser(description='Plot channel long profile and/or map view, optionally higlighting a channel starting from a provided segment id.')
+parser.add_argument("segments", help="Path to geopackage file with segments (output from lsdtt-network-tool)", type=str)
+parser.add_argument("nodes", help="Path to geopackage file with nodes (output from lsdtt-network-tool)", type=str)
+parser.add_argument("--id", help="segment id (see attribute table) of the upstream-most segment of the flow path to plot and/or highlight", type=int)
+#parser.add_argument("river_name", help="name of the river (used for title of plots)", type=str)
+
+# OUTPUT
+# Starting with just two long-profile plots
+parser.add_argument("--lp", help="long profile starting from ID", type=int)
+parser.add_argument("--lp-all", help="long profile of all streams, with (optionally) the portion starting from ID highlighted", type=int)
+
 
 args = parser.parse_args()
 #Input selected segment_ID. This will be the start of the path.
-input_segment_id = args.input_segment_id
-input_segments = args.input_segments
-input_nodes = args.input_nodes
-river_name = args.river_name
+input_segment_id = args.id
+input_segments = args.segments
+input_nodes = args.nodes
+#river_name = args.river_name
 
 """
 input_segments = 'GooseberryNetworkTest20211117_6.gpkg'
