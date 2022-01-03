@@ -339,7 +339,7 @@ if _export_all_nodes:
     dfnodes['network_node_type'] = ""
     #for mouth in mouth_nodes:
     #   dfnodes.loc[mouth]['network_node_type'] = 'mouth'
-    gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude), crs="EPSG:4326")
+    gdf_NetworkNodes = gpd.GeoDataFrame( dfnodes, geometry=gpd.points_from_xy(dfnodes.longitude, dfnodes.latitude, dfnodes.elevation), crs="EPSG:4326")
     gdf_NetworkNodes.to_file(file_output_nodes, driver="GPKG")
     print('Nodes written to', file_output_nodes)
 
