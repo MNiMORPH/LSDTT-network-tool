@@ -132,4 +132,4 @@ dmypy.json
 *.gpkg*
 *.csv
 *.png
-
+*.pdf
