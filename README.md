@@ -2,6 +2,7 @@
 Builds a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions. Uses: analysis, plotting, GIS, model input.
 
 # Guide 
+This tool has two parts, the first builds a network of lines and points, and the second creates long profile plots. 
 
 ## Initial step: build the channel network using lsdtt-network-tool.py
 
@@ -10,16 +11,16 @@ lsdtt-network-tool.py creates a geopackage containing a channel networkmade of l
 ### Inputs
 _Necessary inputs:_
 
-* file_input: The *_MChiSegmented.csv output from LSDTT2
+* `file_input`: The *_MChiSegmented.csv output from LSDTT2
 
-* file_output: The filename for the output geodatabase(s)
+* `file_output`: The filename for the output geodatabase(s)
 
 
 _Optional inputs:_
 
-* --basin_key=BASIN_KEY: adding this flag allows you to select a single basin for which to generate a network. If the --basin_key flag is not used, then all channels generated during chi-mapping will be included in the geopackage
+* `--basin_key=BASIN_KEY`: adding this flag allows you to select a single basin for which to generate a network. If the `--basin_key` flag is not used, then all channels generated during chi-mapping will be included in the geopackage
 
-* -n (--node_export): adding this flag tells the program to export all nodes (in addition to all line segments) to a geopackage. Including this flag is necessary if you are to use lsdtt-channel-plotter.py.
+* `-n` (`--node_export`): adding this flag tells the program to export all nodes (in addition to all line segments) to a geopackage. Including this flag is necessary if you are to use lsdtt-channel-plotter.py.
 
 
 ### Outputs
