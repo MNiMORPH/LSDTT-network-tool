@@ -195,8 +195,8 @@ if _plot_selected_lp:
     else:
         plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth=4)
     plt.gca().invert_xaxis()
-    plt.xlabel('Upchannel distance [km]', fontsize=16)
-    plt.ylabel('Elevation [m]', fontsize=16)
+    plt.xlabel('Upchannel Distance [km]', fontsize=16)
+    plt.ylabel('Elevation Above Mouth [m]', fontsize=16)
     plt.tight_layout()
     if outbase is not None:
         plt.savefig(outbase+'_LongProfile.'+outfmt, dpi=300,
@@ -210,8 +210,8 @@ if _plot_combined:
         plt.plot((nodes_segs['flow_distance']/1000), nodes_segs['elevation'],
                   color='gray', linewidth=1)
     #plt.title(river_name, fontdict=None, loc='center', pad=None)
-    plt.xlabel('Upchannel distance [km]')
-    plt.ylabel('Elevation [m]')
+    plt.xlabel('Upchannel Distance [km]')
+    plt.ylabel('Elevation Above Mouth [m]')
     #plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
     
     #plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
@@ -222,8 +222,8 @@ if _plot_combined:
     else:
         plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth=4, zorder=999999)#0)
     plt.gca().invert_xaxis()
-    plt.xlabel('Upchannel distance [km]', fontsize=16)
-    plt.ylabel('Elevation [m]', fontsize=16)
+    plt.xlabel('Upchannel Distance [km]', fontsize=16)
+    plt.ylabel('Elevation Above Mouth [m]', fontsize=16)
     plt.tight_layout()
     if outbase is not None:
         plt.savefig(outbase+'_LongProfiles_AllWithHighlight.'+outfmt, dpi=300,
@@ -252,8 +252,8 @@ if _plot_all_lps:
         cbar = plt.colorbar(sc, label='log$_{10} (k_{sn})$')#, fontsize=16)
         cbar.set_label(label='log$_{10} (k_{sn})$', fontsize=16)
     plt.gca().invert_xaxis()
-    plt.xlabel('Upchannel distance [km]', fontsize=16)
-    plt.ylabel('Elevation [m]', fontsize=16)
+    plt.xlabel('Upchannel Distance [km]', fontsize=16)
+    plt.ylabel('Elevation Above Mouth [m]', fontsize=16)
     plt.tight_layout()
     if outbase is not None:
         plt.savefig(outbase+'_LongProfiles_All.'+outfmt, dpi=300,
@@ -266,8 +266,8 @@ plt.figure()
 for seg, nodes_segs in dfnodes.groupby('segment_id'):
     plt.plot((nodes_segs['flow_distance']/1000), nodes_segs['elevation'], color= 'gray', linewidth=1)
 #plt.title(river_name, fontdict=None, loc='center', pad=None)
-plt.xlabel('Upchannel distance [km]')
-plt.ylabel('Elevation [m]')
+plt.xlabel('Upchannel Distance [km]')
+plt.ylabel('Elevation Above Mouth [m]')
 plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'],'k-', linewidth=4)
 plt.gca().invert_xaxis()
 
@@ -318,8 +318,8 @@ plt.savefig("PathMap", dpi=300, facecolor='w', edgecolor='w',
 plt.figure()
 #plt.title(river_name, fontdict=None, loc='center', pad=None)
 plt.plot((dfpath_nodes['flow_distance']/1000), dfpath_nodes['elevation'], 'k-', linewidth= 3)
-plt.xlabel('Upchannel distance [km]')
-plt.ylabel('Elevation [m]')
+plt.xlabel('Upchannel Distance [km]')
+plt.ylabel('Elevation Above Mouth [m]')
 plt.gca().invert_xaxis()
 
 plt.savefig("PathChannelLongProfile", dpi=300, facecolor='w', edgecolor='w',
