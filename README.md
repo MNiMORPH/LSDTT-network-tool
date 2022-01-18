@@ -2,7 +2,7 @@
 Builds a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions. Uses: analysis, plotting, GIS, model input.
 
 # Guide 
-This tool has two parts, the first builds a network of lines and points, and the second creates long profile plots. 
+This tool has two parts, the first builds a network of lines and points, and the second creates long profile plots. For each section of this tool, this guide will explain what the tool does, the inputs, the outputs, and an example workflow. 
 
 ## Initial step: build the channel network using lsdtt-network-tool.py
 
@@ -27,13 +27,23 @@ _Optional inputs:_
 
 * file_output.gpkg
 
-* file_output_nodes.gpkg (only with use of -n / --node_export flag)
+* file_output_nodes.gpkg (only with use of `-n` / `--node_export flag`)
 
 ### Example workflow
  
 ## Final step: generate plots of the network and the channel long profile using lsdtt-channel-plotter.py
 
 
+### Inputs ###
+_Neccesary Inputs_
+* asdf
+* asdf
+
+_Optional Inputs_
+* asdf
+* asdf
+
+### Example workflow
 
 
 # Goals for Network Tool
