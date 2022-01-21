@@ -80,9 +80,13 @@ _Optional inputs:_
 
 * file_output.gpkg
 
-* file_output_nodes.gpkg (only with use of `-n` / `--node_export flag`)
+* file_output_nodes.gpkg (only with use of `-n` / `--node_export` flag)
 
 #### Example workflow
+ 
+ ```
+ python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-network-tool.py CascadeRiver_MChiSegmented.csv CascadeRiver_network.gpkg -n --basin_key=6
+ ```
  
 ### Final step: generate plots of the network and the channel long profile using lsdtt-channel-plotter.py
 
@@ -98,6 +102,9 @@ _Optional Inputs_
 
 #### Example workflow
 
+```
+python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-channel-plotter.py CascadeRiver_network.gpkg CascadeRiver_network_nodes.gpkg --id=0 --outbase=CascadeRiver --outfmt=svg -packsg
+```
 
 # Goals for Network Tool
 ## Inputs
