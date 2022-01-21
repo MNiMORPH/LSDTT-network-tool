@@ -7,7 +7,7 @@ Before the lsdtt-network-tool can be used, we must create some files with the or
 There are two tools that you will use in order to generate plots from your DEM. The first is the lsdtt-chi-mapping tool within LSDTopoTools, and the second is this one--the LSDTT-network-tool. Along the way, we will explain what the tool does, the neccesary (and optional) inputs, the outputs you will receive, and we will follow an example workflow from beginning to end to show how to structure commands. 
 
 ## Section 1: Using The `lsdtt-chi-mapping` Tool: Extracting Channels From Your DEM 
-LSDTopoTools is a program with many tools that are able to extract a range of data from elevation data. The `lsdtt-chi-mapping` tool can be used to create channel networks and record various parameters along each channel, such as elevation, flow distance, drainage area, m chi and b chi, and more. 
+LSDTopoTools is a program with many tools that are able to extract a range of data from elevation data. The `lsdtt-chi-mapping` tool can be used to create channel networks and record various parameters along each channel, such as elevation, flow distance, drainage area, chi, and more. 
 
 ## Section 2: Using The LSDTT-network-tool: Converting The Chi Map Data Into Easily Readable Plots 
 
