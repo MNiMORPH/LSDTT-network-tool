@@ -6,51 +6,82 @@ Before the lsdtt-network-tool can be used, we must create some files with the or
 
 There are two tools that you will use in order to generate plots from your DEM. The first is the lsdtt-chi-mapping tool within LSDTopoTools, and the second is this one--the LSDTT-network-tool. Along the way, we will explain what the tool does, the neccesary (and optional) inputs, the outputs you will receive, and we will follow an example workflow from beginning to end to show how to structure commands. 
 
-## Section 1: Using The `lsdtt-chi-mapping` Tool: Extracting Channels From Your DEM 
+### Section 1: Using The `lsdtt-chi-mapping` Tool: Extracting Channels From Your DEM 
 LSDTopoTools is a program with many tools that are able to extract a range of data from elevation data. The `lsdtt-chi-mapping` tool can be used to create channel networks and record various parameters along each channel, such as elevation, flow distance, drainage area, chi, and more. 
 
 #### Inputs
+* A digital elevation model (DEM) in the the ENVI .bil format of your area of interest.
+  * If you have a DEM in a different format, you can use `gdal_tranlate` with the flag `-of ENVI` to convert to the correct format.  
+* A parameter file
+  * We will go through what needs to be included in this file. It must be a plain text file (not a word or google document).
 
 #### Outputs
+* *_MChiSegmented.csv
+* *_chi_data_map.csv
+* *_hs.bil
 
 #### Workflow
 
-Step 1: Fill nulls in your your DEM
-* There are definitely many ways to do this, but we will suggest two: the 'r.fillnulls' tool in the Grass package of qgis and the 'Fill nodata' tool in the GDAL package of qgis.  
+##### Step 1: Fill nulls in your your DEM #####
+   * There are definitely many ways to do this, but we will suggest two: the  the 'Fill nodata' tool in the GDAL package of qgis and the 'r.fillnulls' tool in the Grass package of qgis.  
 
-Step 2: write a parameter file
-* Now this will have some variation depending on what your DEM is of and what outputs you are interested in, but there some portions that everyone will need. The first few lines of your parameter file should include the location and naming information for the files that you are inputting and that will be outputted. For our example this looks like:
-```
+##### Step 2: Write a parameter file #####
+   * In order to write this file you will need to be able to edit a plain text file,which have some variation depending on your DEM and what outputs you are interested in, but there a few lines that everyone will need. The first few lines of your parameter file should include the location and naming information for the files that you are inputting and that will be outputted. For our example, the first few lines look like:
+   ```
 read path: /home/josie/LSDTopoTools/Northshore_Data/CascadeRiver
 write path: /home/josie/LSDTopoTools/Northshore_Data/CascadeRiver
 read fname: CascadeRiver
 write fname: CascadeRiver
+
 channel heads fname: NULL
-```
-* Next, you need information about how the computer will process the data you give it. For our example, this looks like:
-```
-# Parameter for filling the DEM
+   ```
+   * As you can see, we have a read path and a write path, which tell the computer where to find the files that we want it to use, the read filename (`read fname`), which are the prefix that we want the computer look for at the beginning of the names of input files and the write filename (`write fname`) which is the prefix we want the computer to attach to the beginning of the name of all the files that it outputs. Below those there is the channel heads fname, which would be a file (along with its full path if not local) which contains the locations of the the channel heads in the area of interest. If you do not have one, write NULL. 
+
+   * Next, in your parameter file is information about how the computer will process the input data. For our example, this looks like:
+   ```
+# Parameter for filling the DEM 
 min_slope_for_fill: 0.0001
 
 # Parameters for selecting channels and basins
 threshold_contributing_pixels: 10000
-connected_components_threshold: 100
-print_area_threshold_channels: true
-print_wiener_channels: false
-print_pelletier_channels: false
-print_dreich_channels: false
+minimum_basin_size_pixels: 100000
+maximum_basin_size_pixels: 6000000
+test_drainage_boundaries: false
+# Use network tool to select largest complete basin via "--basin_key"
+find_largest_complete_basins: false
+find_complete_basins_in_window: false
 
+# The data that you want printed to file
 write_hillshade: true
-print_stream_order_raster: true
+print_basin_raster: false
+print_chi_data_maps: true
+print_basic_M_chi_map_to_csv: false
+print_segmented_M_chi_map_to_csv: true
+use_extended_channel_data: true
 
-surface_fitting_radius: 2
+
+# Chi analysis options
+m_over_n: 0.5
+A_0: 1
+
+   ```
+* First is a parameter that is used for filling the DEM. Next there is a series of parameters that the computer will use to select basins and locate channels. Adjusting these will affect the size of basins and the starting locations of rivers. In this example, we are using area-threshold extraction, but there are a number of algorithms available in this program to extract basins and channels. If you are interested in more information about what they are and how to use them, visit the [LSDTopoTools documentation page](https://lsdtopotools.github.io/LSDTT_documentation/). Next, there are some instructions to tell the computer what data we want it to print. For creating long profiles, you must include `print_chi_data_maps: true`, `print_segmented_M_chi_map_to_csv: true`, and  `use_extended_channel_data: true`. Finally, there are some parameters for the chi analysis. 
+ 
+* Save the parameter with a helpful name followed by `.param` in the same folder as your DEM. For our example the parameter file was named `LSDTT_Chi_Analysis.param`. Now that we have a parameter file, we can actually process the data. 
+
+##### Step 3: Navigate to the folder that contains your DEM and your parameter file #####
+* This simplifies the command you write greatly, because you do not have to include the full path to the parameter file.
+
+##### Step 4: Ask the computer to run the lsdtt-chi-mapping tool on your data #####
+* Now that you are in the right folder, this is the easy part. Type the command: 
 ```
-* Now that we have a parameter file, we can actually process the data. 
-
-Step 3: Navigate to the folder that contains your DEM and your parameter file
-
-Step 4: Ask the computer to run the lsdtt-chi-mapping tool on your data
-
+lsdtt-chi-mapping name-of-you-parameter-file
+```
+* For our example, the command looked like:
+```
+lsdtt-chi-mapping LSDTT_chi_analysis.param
+```
+This will probably take a bit of time. Running our example data (~110 Mb) on our relatively powerful lab computer (which certainly has more horsepower than a most laptops) takes a few minutes. 
 
 ## Section 2: Using The LSDTT-network-tool: Converting The Chi Map Data Into Easily Readable Plots 
 
@@ -83,7 +114,6 @@ _Optional inputs:_
 * file_output_nodes.gpkg (only with use of `-n` / `--node_export` flag)
 
 #### Example workflow
- 
  ```
  python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-network-tool.py CascadeRiver_MChiSegmented.csv CascadeRiver_network.gpkg -n --basin_key=6
  ```
@@ -101,7 +131,6 @@ _Optional Inputs_
 * asdf
 
 #### Example workflow
-
 ```
 python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-channel-plotter.py CascadeRiver_network.gpkg CascadeRiver_network_nodes.gpkg --id=0 --outbase=CascadeRiver --outfmt=svg -packsg
 ```
