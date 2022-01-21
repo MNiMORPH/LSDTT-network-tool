@@ -16,7 +16,7 @@ LSDTopoTools is a program with many tools that are able to extract a range of da
 #### Workflow
 
 Step 1: Fill nulls in your your DEM
-* There are definitely many ways to do this, but we will suggest one: use the r.fillnulls tool in the Grass package of qgis. 
+* There are definitely many ways to do this, but we will suggest two: the 'r.fillnulls' tool in the Grass package of qgis and the 'Fill nodata' tool in the GDAL package of qgis.  
 
 Step 2: write a parameter file
 * Now this will have some variation depending on what your DEM is of and what outputs you are interested in, but there some portions that everyone will need. The first few lines of your parameter file should include the location and naming information for the files that you are inputting and that will be outputted. For our example this looks like:
