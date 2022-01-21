@@ -9,6 +9,49 @@ There are two tools that you will use in order to generate plots from your DEM. 
 ## Section 1: Using The `lsdtt-chi-mapping` Tool: Extracting Channels From Your DEM 
 LSDTopoTools is a program with many tools that are able to extract a range of data from elevation data. The `lsdtt-chi-mapping` tool can be used to create channel networks and record various parameters along each channel, such as elevation, flow distance, drainage area, chi, and more. 
 
+#### Inputs
+
+#### Outputs
+
+#### Workflow
+
+Step 1: Fill nulls in your your DEM
+* There are definitely many ways to do this, but we will suggest one: use the r.fillnulls tool in the Grass package of qgis. 
+
+Step 2: write a parameter file
+* Now this will have some variation depending on what your DEM is of and what outputs you are interested in, but there some portions that everyone will need. The first few lines of your parameter file should include the location and naming information for the files that you are inputting and that will be outputted. For our example this looks like:
+```
+read path: /home/josie/LSDTopoTools/Northshore_Data/CascadeRiver
+write path: /home/josie/LSDTopoTools/Northshore_Data/CascadeRiver
+read fname: CascadeRiver
+write fname: CascadeRiver
+channel heads fname: NULL
+```
+* Next, you need information about how the computer will process the data you give it. For our example, this looks like:
+```
+# Parameter for filling the DEM
+min_slope_for_fill: 0.0001
+
+# Parameters for selecting channels and basins
+threshold_contributing_pixels: 10000
+connected_components_threshold: 100
+print_area_threshold_channels: true
+print_wiener_channels: false
+print_pelletier_channels: false
+print_dreich_channels: false
+
+write_hillshade: true
+print_stream_order_raster: true
+
+surface_fitting_radius: 2
+```
+* Now that we have a parameter file, we can actually process the data. 
+
+Step 3: Navigate to the folder that contains your DEM and your parameter file
+
+Step 4: Ask the computer to run the lsdtt-chi-mapping tool on your data
+
+
 ## Section 2: Using The LSDTT-network-tool: Converting The Chi Map Data Into Easily Readable Plots 
 
 There are two main steps in this section: the first builds a network of lines and points that can be easily entered into a GIS program of your choice, and the second creates long profile plots. This tool is really for visualizing data that you have already created using the LSDTopoTools program. 
