@@ -87,7 +87,7 @@ lsdtt-chi-mapping name-of-you-parameter-file
 ```
 lsdtt-chi-mapping LSDTT_chi_analysis.param
 ```
-This will probably take a bit of time. Running our example data (~110 Mb) on our relatively powerful lab computer (which has 4 to 6 times more horsepower than a most laptops) takes a few minutes. If all goes well, then its time to move on to getting this data cleaned up to make nice plots!
+* This will probably take a bit of time. Running our example data (~110 Mb) on our relatively powerful lab computer (which has 4 to 6 times more horsepower than a most laptops) takes a few minutes. If all goes well, then its time to move on to getting this data cleaned up to make nice plots!
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -140,17 +140,22 @@ _Optional inputs:_
       - Using the 'identify features' tool click on a channel that you are interested in. In the identify results box on the right, you will find the 'basin_key' for that channels network. 
 
 ##### Step 3: Use the network tool to print line (and point) network geopackage(s)
+
+* Now that we have our basin_key and our data is organized, we can create our channel network geopackage(s). The command will looks something like the following:
  ```
- python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-network-tool.py CascadeRiver_MChiSegmented.csv CascadeRiver_network.gpkg -n --basin_key=6
+ python /home/josie/LSDTopoTools/LSDTT-network-tool/lsdtt-network-tool.py CascadeRiver_MChiSegmented.csv CascadeRiver_network.gpkg --basin_key=6 -n 
  ```
+* First, you tell the computer to use the network-tool, this includes telling it to use python, and then the location of the program and its name. this is followed by the `file_input` which is the name of the file you want it to use, then the `file output` which is what you would like to name the geopackage(s). Next, we provide the `basin_key` and tell the `-n`/`--print_nodes` flag (optional). 
+* Run the command, then we are ready for the next step!
+ 
  
 ### Final step: generate plots of the network and the channel long profile using lsdtt-channel-plotter.py
 
 
 #### Inputs 
 _Neccesary Inputs_
-* asdf
-* asdf
+* *.gpkg
+* *_nodes.gpkg
 
 _Optional Inputs_
 * asdf
