@@ -154,8 +154,8 @@ _Optional inputs:_
 
 #### Inputs 
 _Neccesary Inputs_
-* *.gpkg
-* *_nodes.gpkg
+* *.gpkg: geopackage created in previous step containing segments
+* *_nodes.gpkg: geopackage containing created in previous step containing nodes 
 
 _Optional Inputs_
 * asdf
