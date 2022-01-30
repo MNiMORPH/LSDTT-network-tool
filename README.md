@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5920024.svg)](https://doi.org/10.5281/zenodo.5920024)
+
 # LSDTT-network-tool
 Builds a vectorized drainage network from LSDTopoTools outputs, divided at tributary junctions. Uses: analysis, plotting, GIS, model input.
 
